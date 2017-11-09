@@ -68,10 +68,12 @@ void draw() {
     
   if(showTube) 
     {
-    fill(grey); beam(P.G[0],Q.G[0],rt);
-    fill(orange); beam(P.G[0],P.G[1],rt);
-    fill(green); beam(Q.G[0],Q.G[1],rt);
+    //fill(grey); beam(P.G[0],Q.G[0],rt);
+    //fill(orange); beam(P.G[0],P.G[1],rt);
+    //fill(green); beam(Q.G[0],Q.G[1],rt);
     }
+    
+  triangulate(P, orange, Q, green, grey);
   
   popMatrix(); // done with 3D drawing. Restore front view for writing text on canvas
   hint(DISABLE_DEPTH_TEST); // no z-buffer test to ensure that help text is visible

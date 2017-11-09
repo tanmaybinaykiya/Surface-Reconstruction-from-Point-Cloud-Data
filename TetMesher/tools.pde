@@ -10,6 +10,11 @@ color black=#000000, white=#FFFFFF, // set more colors using Menu >  Tools > Col
    grey=#818181, orange=#FFA600, brown=#B46005, metal=#B5CCDE, 
    lime=#A4FA83, pink=#FCC4FA, dgreen=#057103,
    lightWood=#F5DEA6, darkWood=#D8BE7A;
+   
+color 
+  alphared = color(255, 0, 0, 128),
+  alphagrey = color(128, 128, 128, 64);
+  
 void pen(color c, float w) {stroke(c); strokeWeight(w);}
 
 // ******************************** TEXT , TITLE, and USER's GUIDE
