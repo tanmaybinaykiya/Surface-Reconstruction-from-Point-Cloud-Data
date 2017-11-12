@@ -25,9 +25,9 @@ void triangulate(Points floor, color floorColor, Points ceil, color ceilColor, c
   for (int a = 0; a < floor.nv; a++) {
     for (int b = a + 1; b < floor.nv; b++) {
       for (int c = b + 1; c < floor.nv; c++) {
-        Point A = floor.G[a];
-        Point B = floor.G[b];
-        Point C = floor.G[c];
+        Point A = floor.G.get(a);
+        Point B = floor.G.get(b);
+        Point C = floor.G.get(c);
         
         Point P = circumcenter(A, B, C);
         float circleRadius = min(d(A, P), d(B, P), d(C, P));
@@ -38,7 +38,7 @@ void triangulate(Points floor, color floorColor, Points ceil, color ceilColor, c
           if (l == a || l == b || l == c) 
             continue;
             
-          if (d(floor.G[l], P) < circleRadius) {
+          if (d(floor.G.get(l), P) < circleRadius) {
             foundInside = true;
             break;
           }
@@ -55,7 +55,7 @@ void triangulate(Points floor, color floorColor, Points ceil, color ceilColor, c
         beam(B, C, rt);
         
         for (int d = 0; d < ceil.nv; d++) {
-          Point D = ceil.G[d];
+          Point D = ceil.G.get(d);
           
           // The circumcenter of the sphere is given by Q = P + sN, where
           //   P is a circumcenter of one of the triangles
@@ -82,7 +82,7 @@ void triangulate(Points floor, color floorColor, Points ceil, color ceilColor, c
           Point Q = P(P, s, N);
           
           // Draw the circumsphere
-          drawCircumcenter(Q, A, B, C, D, alphagrey, true);
+          drawCircumsphere(Q, A, B, C, D, alphagrey, true);
           fill(betweenColor);
           beam(A, D, rt);
           beam(B, D, rt);
@@ -97,7 +97,7 @@ void triangulate(Points floor, color floorColor, Points ceil, color ceilColor, c
   }
 }
 
-void drawCircumcenter(Point P, Point A, Point B, Point C, color col, boolean showBeams) {
+void drawCircumcircle(Point P, Point A, Point B, Point C, color col, boolean showBeams) {
   // Draw the components
   fill(col);
   show(P, rb / 5);  // circumcenter
@@ -109,7 +109,7 @@ void drawCircumcenter(Point P, Point A, Point B, Point C, color col, boolean sho
   }
 }
 
-void drawCircumcenter(Point Q, Point A, Point B, Point C, Point D, color col, boolean showBeams) {
+void drawCircumsphere(Point Q, Point A, Point B, Point C, Point D, color col, boolean showBeams) {
   // Draw the components
   fill(col);
   show(Q, rb / 5);  // circumcenter
