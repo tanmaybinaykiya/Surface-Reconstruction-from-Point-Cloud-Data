@@ -44,33 +44,31 @@ void triangulate(Points floor, color floorColor, Points ceil, color ceilColor, c
   
         drawTriangle(A, B, C, floorColor);
 
-        for (int d = 0; d < ceil.nv; d++) {
-          Point D = ceil.G.get(d);
-          Point Q = computeCircumsphereCenter(P, A, B, C, D);
-
-          float sphereRadius = min(min(d(A,Q), d(B,Q), d(C,Q)), d(D,Q));
-          //fill(alphagrey);
-          //show(Q, sphereRadius);
-          
-          foundInside = false;
-          for (int e = 0; e < ceil.nv; e++) {
-            Point E = ceil.G.get(e);
-            if (d(E,Q) < sphereRadius) {
-              foundInside = true;
-              break;
-            }
-          }
-          
-          if (foundInside) {
-            continue;
-          }
-          
-          drawInterlevelBeams(A, B, C, D, betweenColor);
-          drawCircumsphere(Q, A, B, C, D, alphagrey, true);
-        }
+        Point D = findClosestPointOnCeilingUsingBulge(P, ceil);
+        drawInterlevelBeams(A, B, C, D, betweenColor);
       }
     }
   }
+}
+
+Point findClosestPointOnCeilingUsingBulge(Point P, Points ceiling){
+  
+  // assumes that both the planes are parallel. will have to resort to O(n^2) approach for non parallel planes
+  if(ceiling.nv == 0){
+    throw new RuntimeException("No points in ceiling");
+  }
+  // projection of P on ceiling plane - just copying x, y values 
+  Point PDash = P(P.x, P.y, ceiling.G.get(0).z);
+  Point D = ceiling.G.get(0);
+  float minDist =  d(PDash, ceiling.G.get(0));
+  for (int i =1; i<ceiling.nv; i++){
+    float dist = d(PDash, ceiling.G.get(i));
+    if (dist < minDist) {
+      D = ceiling.G.get(i);
+      minDist = dist;
+    }
+  }
+  return D;  
 }
 
 void drawTriangle(Point A, Point B, Point C, color floorColor){
