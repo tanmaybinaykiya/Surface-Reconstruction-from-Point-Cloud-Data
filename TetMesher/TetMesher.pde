@@ -74,6 +74,7 @@ void draw() {
     }
     
   triangulate(P, orange, Q, green, grey);
+  triangulate(Q, green, P, orange, grey);
   
   popMatrix(); // done with 3D drawing. Restore front view for writing text on canvas
   hint(DISABLE_DEPTH_TEST); // no z-buffer test to ensure that help text is visible

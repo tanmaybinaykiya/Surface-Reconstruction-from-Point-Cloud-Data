@@ -47,6 +47,24 @@ void triangulate(Points floor, color floorColor, Points ceil, color ceilColor, c
         for (int d = 0; d < ceil.nv; d++) {
           Point D = ceil.G.get(d);
           Point Q = computeCircumsphereCenter(P, A, B, C, D);
+
+          float sphereRadius = min(min(d(A,Q), d(B,Q), d(C,Q)), d(D,Q));
+          //fill(alphagrey);
+          //show(Q, sphereRadius);
+          
+          foundInside = false;
+          for (int e = 0; e < ceil.nv; e++) {
+            Point E = ceil.G.get(e);
+            if (d(E,Q) < sphereRadius) {
+              foundInside = true;
+              break;
+            }
+          }
+          
+          if (foundInside) {
+            continue;
+          }
+          
           drawInterlevelBeams(A, B, C, D, betweenColor);
           drawCircumsphere(Q, A, B, C, D, alphagrey, true);
         }
