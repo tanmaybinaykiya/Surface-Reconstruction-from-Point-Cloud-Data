@@ -2,45 +2,45 @@
 
 import java.nio.*;
 import processing.core.PMatrix3D;
-pt PP=P(); // picked point
+Point PP=P(); // picked point
 Boolean  picking=false;
 
 float dz=0;                                 // distance to camera. Manipulated with wheel or when 's' is pressed and mouse moved
 float rx=-0.06*TWO_PI, ry=-0.04*TWO_PI;     // view angles manipulated when space bar (but not mouse) is pressed and mouse is moved
-pt Viewer = P(); // location of the viewpoint
-pt F = P(1000,1000,h_ceiling/2);  // focus point:  the camera is looking at it (moved when 'f or 'F' are pressed
-pt Of=P(1000,1000,0), Ofp=P(1000,1000,0); // current and previous point on the floor under the mouse
+Point Viewer = P(); // location of the viewpoint
+Point F = P(1000,1000,h_ceiling/2);  // focus point:  the camera is looking at it (moved when 'f or 'F' are pressed
+Point Of=P(1000,1000,0), Ofp=P(1000,1000,0); // current and previous point on the floor under the mouse
 boolean viewpoint=false;  // set to show frozen viewpoint and frustum from a different angle
 
 //*********** TOOLS FOR 3D PICK ******************
-pt ToScreen(pt P) {return P(screenX(P.x,P.y,P.z),screenY(P.x,P.y,P.z),0);}  // O+xI+yJ+kZ
-pt ToModel(pt P) {return P(modelX(P.x,P.y,P.z),modelY(P.x,P.y,P.z),modelZ(P.x,P.y,P.z));}  // O+xI+yJ+kZ
+Point ToScreen(Point P) {return P(screenX(P.x,P.y,P.z),screenY(P.x,P.y,P.z),0);}  // O+xI+yJ+kZ
+Point ToModel(Point P) {return P(modelX(P.x,P.y,P.z),modelY(P.x,P.y,P.z),modelZ(P.x,P.y,P.z));}  // O+xI+yJ+kZ
 
-vec I=V(1,0,0), J=V(0,1,0), K=V(0,0,1); // screen projetions of global model frame
+Vector I=V(1,0,0), J=V(0,1,0), K=V(0,0,1); // screen projetions of global model frame
 
 void computeProjectedVectors() { 
-  pt O = ToScreen(P(0,0,0));
-  pt A = ToScreen(P(1,0,0));
-  pt B = ToScreen(P(0,1,0));
-  pt C = ToScreen(P(0,0,1));
+  Point O = ToScreen(P(0,0,0));
+  Point A = ToScreen(P(1,0,0));
+  Point B = ToScreen(P(0,1,0));
+  Point C = ToScreen(P(0,0,1));
   I=V(O,A);
   J=V(O,B);
   K=V(O,C);
   }
 
-vec ToIJ(vec V) {
+Vector ToIJ(Vector V) {
  float x = det2(V,J) / det2(I,J);
  float y = det2(V,I) / det2(J,I);
  return V(x,y,0);
  }
  
-vec ToK(vec V) {
+Vector ToK(Vector V) {
  float z = dot(V,K) / dot(K,K);
  return V(0,0,z);
  }
  
  
-public pt pick(int mX, int mY) { // returns point on visible surface at pixel (mX,My)
+public Point pick(int mX, int mY) { // returns point on visible surface at pixel (mX,My)
   PGL pgl = beginPGL();
   FloatBuffer depthBuffer = ByteBuffer.allocateDirect(1 << 2).order(ByteOrder.nativeOrder()).asFloatBuffer();
   pgl.readPixels(mX, height - mY - 1, 1, 1, PGL.DEPTH_COMPONENT, PGL.FLOAT, depthBuffer);
@@ -67,7 +67,7 @@ public pt pick(int mX, int mY) { // returns point on visible surface at pixel (m
   return P( unprojected[0]/unprojected[3], unprojected[1]/unprojected[3], unprojected[2]/unprojected[3] );
   }
 
-public pt pick(float mX, float mY, float mZ) { 
+public Point pick(float mX, float mY, float mZ) { 
   PGraphics3D p3d = (PGraphics3D)g;
   PMatrix3D proj = p3d.projection.get();
   PMatrix3D modelView = p3d.modelview.get();
@@ -120,7 +120,7 @@ public pt pick(float mX, float mY, float mZ) {
     //P.setIdOfVertexWithClosestScreenProjectionTo2(Mouse()); // ID of vertex of P with closest screen projection to mouse (us in keyPressed 'x'...
     }
 
-pt viewPoint() {return pick( 0,0, (height/2) / tan(PI/6));}
+Point viewPoint() {return pick( 0,0, (height/2) / tan(PI/6));}
 /*  
 in draw, before popMatrix, insert
       

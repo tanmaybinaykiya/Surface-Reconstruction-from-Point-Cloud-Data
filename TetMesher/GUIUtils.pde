@@ -33,7 +33,7 @@ FIFO _LookAtPt = new FIFO();
 class FIFO // class for filtering camera motion
   {   
   int n=0, maxn=200;
-  pt [] C = new pt[maxn];
+  Point [] C = new Point[maxn];
   
   FIFO() 
     {
@@ -41,13 +41,13 @@ class FIFO // class for filtering camera motion
     C[0]=P();
     }
 
-  void reset(pt A, int k) 
+  void reset(Point A, int k) 
     {
     n=k;
     for(int i=0; i<n; i++) C[i]=P(A);
     }
 
-  pt move(pt B) 
+  Point move(Point B) 
     {
     C[0]=P(B,C[0]);
     for(int i=1; i<n; i++) C[i]=P(C[i-1],C[i]);

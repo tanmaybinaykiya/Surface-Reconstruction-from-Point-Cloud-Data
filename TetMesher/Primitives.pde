@@ -1,30 +1,30 @@
 // **************************** DISPLAY PRIMITIVES (spheres, cylinders, cones, arrows) from 3D Pts, Vecs *********
 // procedures for showing balls and lines are in tab "pv3D" (for example "show(P,r)")
 
-void sphere(pt P, float r) {pushMatrix(); translate(P.x,P.y,P.z); sphere(r); popMatrix();}; // render sphere of radius r and center P (same as show(P,r))
+void sphere(Point P, float r) {pushMatrix(); translate(P.x,P.y,P.z); sphere(r); popMatrix();}; // render sphere of radius r and center P (same as show(P,r))
 
 // **************************** PRIMITIVE FROM POINT, VECTOR, RADIUS PARAMETER
-void caplet(pt A, float a, pt B, float b) { // cone section surface that is tangent to Sphere(A,a) and to Sphere(B,b)
-  vec I = U(A,B);
+void caplet(Point A, float a, Point B, float b) { // cone section surface that is tangent to Sphere(A,a) and to Sphere(B,b)
+  Vector I = U(A,B);
   float d = d(A,B), s=b/a;
   float x=(a-b)*a/d, y = sqrt(sq(a)-sq(x));
-  pt PA = P(A,x,I), PB = P(B,s*x,I); 
+  Point PA = P(A,x,I), PB = P(B,s*x,I); 
   coneSection(PA,PB,y,y*s);
   }  
 
-void coneSection(pt P, pt Q, float p, float q) { // surface
-  vec V = V(P,Q);
-  vec I = U(Normal(V));
-  vec J = U(N(I,V));
+void coneSection(Point P, Point Q, float p, float q) { // surface
+  Vector V = V(P,Q);
+  Vector I = U(Normal(V));
+  Vector J = U(N(I,V));
   collar(P,V,I,J,p,q);
   }
 
-void cylinderSection(pt P, pt Q, float r) { coneSection(P,Q,r,r);}
+void cylinderSection(Point P, Point Q, float r) { coneSection(P,Q,r,r);}
  
 
 
 // FANS, CONES, AND ARROWS
-void disk(pt P, vec I, vec J, float r) {
+void disk(Point P, Vector I, Vector J, float r) {
   float da = TWO_PI/36;
   beginShape(TRIANGLE_FAN);
     v(P);
@@ -32,13 +32,13 @@ void disk(pt P, vec I, vec J, float r) {
   endShape();
   }
   
-void disk(pt P, vec V, float r) {  
-  vec I = U(Normal(V));
-  vec J = U(N(I,V));
+void disk(Point P, Vector V, float r) {  
+  Vector I = U(Normal(V));
+  Vector J = U(N(I,V));
   disk(P,I,J,r);
   }
 
-void fan(pt P, vec V, vec I, vec J, float r) {
+void fan(Point P, Vector V, Vector I, Vector J, float r) {
   float da = TWO_PI/36;
   beginShape(TRIANGLE_FAN);
     v(P(P,V));
@@ -46,46 +46,46 @@ void fan(pt P, vec V, vec I, vec J, float r) {
   endShape();
   }
   
-void fan(pt P, vec V, float r) {  
-  vec I = U(Normal(V));
-  vec J = U(N(I,V));
+void fan(Point P, Vector V, float r) {  
+  Vector I = U(Normal(V));
+  Vector J = U(N(I,V));
   fan(P,V,I,J,r);
   }
 
-void collar(pt P, vec V, float r, float rd) {
-  vec I = U(Normal(V));
-  vec J = U(N(I,V));
+void collar(Point P, Vector V, float r, float rd) {
+  Vector I = U(Normal(V));
+  Vector J = U(N(I,V));
   collar(P,V,I,J,r,rd);
   }
  
-void collar(pt P, vec V, vec I, vec J, float r, float rd) {
+void collar(Point P, Vector V, Vector I, Vector J, float r, float rd) {
   float da = TWO_PI/36;
   beginShape(QUAD_STRIP);
     for(float a=0; a<=TWO_PI+da; a+=da) {v(P(P,r*cos(a),I,r*sin(a),J,0,V)); v(P(P,rd*cos(a),I,rd*sin(a),J,1,V));}
   endShape();
   }
 
-void cone(pt P, vec V, float r) {fan(P,V,r); disk(P,V,r);}
+void cone(Point P, Vector V, float r) {fan(P,V,r); disk(P,V,r);}
 
-void beam(pt P, pt Q, float r) // cone section
+void beam(Point P, Point Q, float r) // cone section
   {
   stub(P,V(P,Q),r,r);
   }
 
-void stub(pt P, vec V, float r, float rd) // cone section
+void stub(Point P, Vector V, float r, float rd) // cone section
   {
   collar(P,V,r,rd); disk(P,V,r); disk(P(P,V),V,rd); 
   }
 
-void arrow(pt A, pt B, float r) {
-  vec V=V(A,B);
+void arrow(Point A, Point B, float r) {
+  Vector V=V(A,B);
   stub(A,V(.8,V),r*2/3,r/3); 
   cone(P(A,V(.8,V)),V(.2,V),r); 
   }  
   
-void arrow(pt P, float s, vec V, float r) {arrow(P,V(s,V),r);}
+void arrow(Point P, float s, Vector V, float r) {arrow(P,V(s,V),r);}
 
-void arrow(pt P, vec V, float r) {
+void arrow(Point P, Vector V, float r) {
   stub(P,V(.8,V),r*2/3,r/3); 
   cone(P(P,V(.8,V)),V(.2,V),r); 
   }  

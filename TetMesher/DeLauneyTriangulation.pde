@@ -1,35 +1,35 @@
-pt circumcenter(pt A, pt B, pt C) {
+Point circumcenter(Point A, Point B, Point C) {
   // Find the circumcenter of these three points
-  pt M = L(A, 0.5, B);
-  pt H = L(A, 0.5, C);
+  Point M = L(A, 0.5, B);
+  Point H = L(A, 0.5, C);
   
   // Find the vector of the bisector (use cross-products to find this)
-  vec I = V(M,B);
-  vec K = cross(I, V(A,C));
-  vec J = cross(I, K);
-  vec MP = U(J);
+  Vector I = V(M,B);
+  Vector K = cross(I, V(A,C));
+  Vector J = cross(I, K);
+  Vector MP = U(J);
   
   // Compute the magnitude to move towards P
-  vec AM = V(A, M);
-  vec AH = V(A, H);
+  Vector AM = V(A, M);
+  Vector AH = V(A, H);
   float s = (dot(AH, AH) - (dot(AM, AH))) / dot(MP, AH);
   
   // Compute P
-  pt P = P(M, s, MP);    
+  Point P = P(M, s, MP);    
   
   return P;
 }
   
-void triangulate(pts floor, color floorColor, pts ceil, color ceilColor, color betweenColor) {
+void triangulate(Points floor, color floorColor, Points ceil, color ceilColor, color betweenColor) {
   // Find every triplet of points in the pointset
   for (int a = 0; a < floor.nv; a++) {
     for (int b = a + 1; b < floor.nv; b++) {
       for (int c = b + 1; c < floor.nv; c++) {
-        pt A = floor.G[a];
-        pt B = floor.G[b];
-        pt C = floor.G[c];
+        Point A = floor.G[a];
+        Point B = floor.G[b];
+        Point C = floor.G[c];
         
-        pt P = circumcenter(A, B, C);
+        Point P = circumcenter(A, B, C);
         float circleRadius = min(d(A, P), d(B, P), d(C, P));
         
         // Find all other points and determine if they lie in this circumcenter (skip if so)
@@ -55,7 +55,7 @@ void triangulate(pts floor, color floorColor, pts ceil, color ceilColor, color b
         beam(B, C, rt);
         
         for (int d = 0; d < ceil.nv; d++) {
-          pt D = ceil.G[d];
+          Point D = ceil.G[d];
           
           // The circumcenter of the sphere is given by Q = P + sN, where
           //   P is a circumcenter of one of the triangles
@@ -70,16 +70,16 @@ void triangulate(pts floor, color floorColor, pts ceil, color ceilColor, color b
           //   s = (AZ.AZ - AP.AZ) / N.AZ
           
           // Normal to triangle ABC
-          vec N = U(cross(V(A,C), V(B,C)));
+          Vector N = U(cross(V(A,C), V(B,C)));
           
           // Obtain the vectors needed for the calculation
-          pt Z = L(A, 0.5, D);
-          vec AP = V(A, P);
-          vec AZ = V(A, Z);
+          Point Z = L(A, 0.5, D);
+          Vector AP = V(A, P);
+          Vector AZ = V(A, Z);
           
           // Compute the location of Q, the circumcenter of the sphere
           float s = (dot(AZ, AZ) - dot(AP, AZ)) / dot(N, AZ);
-          pt Q = P(P, s, N);
+          Point Q = P(P, s, N);
           
           // Draw the circumsphere
           drawCircumcenter(Q, A, B, C, D, alphagrey, true);
@@ -97,7 +97,7 @@ void triangulate(pts floor, color floorColor, pts ceil, color ceilColor, color b
   }
 }
 
-void drawCircumcenter(pt P, pt A, pt B, pt C, color col, boolean showBeams) {
+void drawCircumcenter(Point P, Point A, Point B, Point C, color col, boolean showBeams) {
   // Draw the components
   fill(col);
   show(P, rb / 5);  // circumcenter
@@ -109,7 +109,7 @@ void drawCircumcenter(pt P, pt A, pt B, pt C, color col, boolean showBeams) {
   }
 }
 
-void drawCircumcenter(pt Q, pt A, pt B, pt C, pt D, color col, boolean showBeams) {
+void drawCircumcenter(Point Q, Point A, Point B, Point C, Point D, color col, boolean showBeams) {
   // Draw the components
   fill(col);
   show(Q, rb / 5);  // circumcenter

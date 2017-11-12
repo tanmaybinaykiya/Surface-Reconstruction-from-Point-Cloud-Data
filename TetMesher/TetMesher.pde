@@ -28,9 +28,9 @@ int
   f=0, maxf=2*30, level=4, method=5;
 String SDA = "angle";
 float defectAngle=0;
-pts P = new pts(); // polyloop in 3D
-pts Q = new pts(); // second polyloop in 3D
-pts R, S; 
+Points P = new Points(); // polyloop in 3D
+Points Q = new Points(); // second polyloop in 3D
+Points R, S; 
     
 
 void setup() {
