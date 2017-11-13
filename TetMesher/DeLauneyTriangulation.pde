@@ -19,6 +19,56 @@ Point circumcenter(Point A, Point B, Point C) {
   
   return P;
 }
+
+void triangulate2to2(Points floor, color floorColor, Points ceil, color ceilColor, color betweenColor) {
+  // Find every triplet of points in the pointset
+  for (int a = 0; a < floor.nv; a++) {
+    for (int b = a + 1; b < floor.nv; b++) {
+      for (int c = 0; c < ceil.nv; c++) {
+        for (int d = c + 1; d < ceil.nv; d++) {
+          Point A = floor.G.get(a);
+          Point B = floor.G.get(b);
+          Point C = ceil.G.get(c);
+          Point D = ceil.G.get(d);
+          
+          Point P = circumcenter(A, B, C);
+          Point Q = computeCircumsphereCenter(P,A,B,C,D);
+          float minRadius = min(min(d(A, Q), d(B, Q), d(C, Q)), d(D, Q));
+          
+          boolean foundInside = false;
+          for (int m = 0; m < floor.nv; m++) {
+            if (m == a || m == b)
+              continue;
+              
+            Point M = floor.G.get(m);
+            if (d(M, Q) < minRadius) {
+              foundInside = true;
+              break;
+            }
+          }
+          for (int n = 0; n < ceil.nv; n++) {
+            if (n == c || n == d)
+              continue;
+              
+            Point N = ceil.G.get(n);
+            if (d(N, Q) < minRadius) {
+              foundInside = true;
+              break;
+            }
+          }
+          
+          if (foundInside)
+            continue;
+          
+          drawTriangle(A, B, C, floorColor);
+          drawTriangle(A, B, D, floorColor);
+          drawTriangle(A, C, D, ceilColor);
+          drawTriangle(B, C, D, ceilColor);
+        }
+      }
+    }
+  }
+}
   
 void triangulate(Points floor, color floorColor, Points ceil, color ceilColor, color betweenColor) {
   // Find every triplet of points in the pointset
@@ -45,7 +95,9 @@ void triangulate(Points floor, color floorColor, Points ceil, color ceilColor, c
         drawTriangle(A, B, C, floorColor);
 
         Point D = findClosestPointOnCeilingUsingBulge(P, ceil);
-        drawInterlevelBeams(A, B, C, D, betweenColor);
+        if (D != null) {
+          drawInterlevelBeams(A, B, C, D, betweenColor);
+        }
       }
     }
   }
@@ -55,7 +107,8 @@ Point findClosestPointOnCeilingUsingBulge(Point P, Points ceiling){
   
   // assumes that both the planes are parallel. will have to resort to O(n^2) approach for non parallel planes
   if(ceiling.nv == 0){
-    throw new RuntimeException("No points in ceiling");
+    //throw new RuntimeException("No points in ceiling");
+    return null;
   }
   // projection of P on ceiling plane - just copying x, y values 
   Point PDash = P(P.x, P.y, ceiling.G.get(0).z);
@@ -76,6 +129,11 @@ void drawTriangle(Point A, Point B, Point C, color floorColor){
   beam(A, B, rt);
   beam(A, C, rt);
   beam(B, C, rt);
+  
+  //fill(color(red(floorColor), green(floorColor), blue(floorColor), 50));
+  //beginShape();
+  //v(A); v(B); v(C);
+  //endShape(CLOSE);
 }
 
 void drawInterlevelBeams(Point A, Point B, Point C, Point D, color betweenColor){
@@ -83,11 +141,22 @@ void drawInterlevelBeams(Point A, Point B, Point C, Point D, color betweenColor)
   beam(A, D, rt);
   beam(B, D, rt);
   beam(C, D, rt);
+  
+  //fill(color(red(betweenColor), green(betweenColor), blue(betweenColor), 50));
+  //beginShape(TRIANGLE_STRIP);
+  //v(A); v(B); v(C); v(D);
+  //v(A); v(B); v(D);
+  //v(C); v(B);
+  //endShape(CLOSE);
+  
+  //beginShape(); v(A); v(B); v(D); endShape(CLOSE);
+  //beginShape(); v(A); v(C); v(D); endShape(CLOSE);
+  //beginShape(); v(B); v(C); v(D); endShape(CLOSE);
 }
 
 Point computeCircumsphereCenter(Point P, Point A, Point B, Point C, Point D){
     // The circumcenter of the sphere is given by Q = P + sN, where
-    //   P is a circumcenter of one of the triangles
+    //   P is a circumcenter of triangle ABC
     //   N is the normal to that triangle
     //
     // Using the two triangles APQ and ADQ, we can compute Q similar to 

@@ -17,7 +17,10 @@ Boolean
   showQuads=true,
   showVecs=true,
   showTube=true,
-  flipped = false;
+  flipped = false,
+  b1 = false,
+  b2 = false,
+  b3 = false;
 float 
  h_floor=0, h_ceiling=600,  h=h_floor,
   t=0, 
@@ -73,8 +76,21 @@ void draw() {
     //fill(green); beam(Q.G[0],Q.G[1],rt);
     }
     
-  triangulate(P, orange, Q, green, grey);
-  triangulate(Q, green, P, orange, grey);
+  if (b1) {
+    // 3-1
+    triangulate(Q, green, P, orange, grey);
+  }
+  
+  if (b2) {
+    // 2-2
+    triangulate2to2(P,orange,Q,green,grey);
+  }
+    
+  if (b3) {
+    // 1-3
+    triangulate(P, orange, Q, green, grey);
+  }
+    
   
   popMatrix(); // done with 3D drawing. Restore front view for writing text on canvas
   hint(DISABLE_DEPTH_TEST); // no z-buffer test to ensure that help text is visible

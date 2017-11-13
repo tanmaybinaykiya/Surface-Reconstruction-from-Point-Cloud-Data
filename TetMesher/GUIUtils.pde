@@ -13,7 +13,9 @@ color black=#000000, white=#FFFFFF, // set more colors using Menu >  Tools > Col
    
 color 
   alphared = color(255, 0, 0, 128),
-  alphagrey = color(128, 128, 128, 64);
+  alphagreen = color(0, 255, 0, 128),
+  alphagrey = color(128, 128, 128, 64),
+  alphawhite = color(255, 255, 255, 128);
   
 void pen(color c, float w) {stroke(c); strokeWeight(w);}
 

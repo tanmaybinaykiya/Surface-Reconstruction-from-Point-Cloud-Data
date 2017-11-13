@@ -9,9 +9,9 @@ void keyPressed()
   if(key=='.') showBalls=!showBalls;
   if(key=='\\') {showTube=!showTube;} // toggle showing th etubes
   if(key=='f') {flipped=!flipped; if(flipped) {R=Q; S=P; h=h_ceiling;} else {R=P; S=Q; h=h_floor;}}
-  if(key=='3') {R.resetOnCircle(3,300); }
-  if(key=='4') {R.resetOnCircle(4,400); }
-  if(key=='5') {R.resetOnCircle(5,500); }
+  //if(key=='3') {R.resetOnCircle(3,300); }
+  //if(key=='4') {R.resetOnCircle(4,400); }
+  //if(key=='5') {R.resetOnCircle(5,500); }
   if(key=='h') rt=rb/2;
   if(key=='H') rt=rb;
   if(key=='q') Q.copyFrom(P);
@@ -23,6 +23,10 @@ void keyPressed()
   if(key=='a') {animating=!animating; }// toggle animation
   if(key=='|') {P.setZ(h_floor); Q.setZ(h_ceiling);} // project all sites on their respective plane
   if(key=='#') exit();
+  
+  if(key=='1') b1 = !b1;
+  if(key=='2') b2 = !b2;
+  if(key=='3') b3 = !b3;
   change=true;   // to save a frame for the movie when user pressed a key 
   }
 

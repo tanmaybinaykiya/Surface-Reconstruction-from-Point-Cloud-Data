@@ -73,6 +73,9 @@ class Points // class for manipulaitng and displaying pointclouds or polyloops i
     }
   Points deletePicked() 
     {
+      if (nv == 0)
+        return this;
+        
     for(int i=pv; i<nv; i++) 
       {
       G.get(i).setTo(G.get(i+1)); 
