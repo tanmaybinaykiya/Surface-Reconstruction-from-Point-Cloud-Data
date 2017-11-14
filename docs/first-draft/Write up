@@ -1,0 +1,11 @@
+Objective: Modeling a truss-like structure between 2 planes defined by disjoint set of points. 
+
+
+Delaunay Triangulation: A Delaunay triangulation for a given set P of discrete points in a plane is a triangulation DT(P) such that no point in P is inside the circumcircle of any triangle in DT(P).
+
+Algorithm to compute the Delaunay triangulation of set P:
+
+For each point in P
+
+Tetrahedralization: For the given sets of planes, 
+
