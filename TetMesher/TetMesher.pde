@@ -77,21 +77,25 @@ void draw() {
     //fill(green); beam(Q.G[0],Q.G[1],rt);
     }
     
+  Set<Edge> edges = new HashSet();
+    
   if (b1) {
-    // 3-1
-    triangulate(Q, green, P, orange, grey);
+    // 1-3
+    edges.addAll(triangulate(P, Q, true));
   }
   
   if (b2) {
     // 2-2
-    triangulate2to2(P,orange,Q,green,grey);
+    edges.addAll(triangulate2to2(P, Q));
   }
     
   if (b3) {
-    // 1-3
-    triangulate(P, orange, Q, green, grey);
+    // 3-1
+    edges.addAll(triangulate(P, Q, false));
   }
     
+  // Draw all of the edges
+  drawEdgeSet(edges, P, Q, green, orange, grey);
   
   popMatrix(); // done with 3D drawing. Restore front view for writing text on canvas
   hint(DISABLE_DEPTH_TEST); // no z-buffer test to ensure that help text is visible

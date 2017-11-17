@@ -19,7 +19,7 @@ class Point
    Point div(float f) {x/=f; y/=f; z/=f; return this;};
    Point div(int f) {x/=f; y/=f; z/=f; return this;};
    
-   int hashCode() {
+   public int hashCode() {
      return Objects.hash(this.x, this.y, this.z);
    }
  }

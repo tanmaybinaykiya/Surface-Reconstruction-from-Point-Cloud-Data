@@ -1,4 +1,34 @@
-Point circumcenter(Point A, Point B, Point C) {
+import java.util.Objects;
+
+public class Edge {
+  /* 
+   * Keeps track of an edge between two vertex IDs.
+   * A positive ID is on the floor, and negative on the ceiling.
+   * IDs begin at 1 (or -1).
+   */
+   
+  public int first, second;
+  
+  public Edge(int vertex1, int vertex2) {
+    // Canonical representation of edge is sorted IDs.
+    this.first = min(vertex1, vertex2);
+    this.second = max(vertex1, vertex2);
+  }
+  
+  public boolean equals(Edge other) {
+    return this.first == other.first && this.second == other.second;
+  }
+  
+  public int hashCode() {
+    return Objects.hash(this.first, this.second);
+  }
+}
+Edge edgeFloorFloor(int v1, int v2) { return new Edge(v1 + 1, v2 + 1); }
+Edge edgeCeilingCeiling(int v1, int v2) { return new Edge(-(v1 + 1), -(v2 + 1)); }
+Edge edgeFloorCeiling(int v1, int v2) { return new Edge(v1 + 1, -(v2 + 1)); }
+Edge edgeCeilingFloor(int v1, int v2) { return new Edge(-(v1 + 1), v2 + 1); }
+
+Point circumcircleCenter(Point A, Point B, Point C) {
   // Find the circumcenter of these three points
   Point M = L(A, 0.5, B);
   Point H = L(A, 0.5, C);
@@ -15,12 +45,39 @@ Point circumcenter(Point A, Point B, Point C) {
   float s = (dot(AH, AH) - (dot(AM, AH))) / dot(MP, AH);
   
   // Compute P
-  Point P = P(M, s, MP);    
-  
-  return P;
+  return P(M, s, MP);    
 }
 
-void triangulate2to2(Points floor, color floorColor, Points ceil, color ceilColor, color betweenColor) {
+Point circumsphereCenter(Point P, Point A, Point B, Point C, Point D){
+    // The circumcenter of the sphere is given by Q = P + sN, where
+    //   P is a circumcenter of triangle ABC
+    //   N is the normal to that triangle
+    //
+    // Using the two triangles APQ and ADQ, we can compute Q similar to 
+    // computing the circumcenter of a triangle:
+    //   Q = P + sN
+    //   AQ = AP + sN
+    //   AQ.AZ = AP.AZ + sN.AZ
+    //      (where Z is midpoint of AD, and therefore AQ.AZ == AZ.AZ)
+    //   s = (AZ.AZ - AP.AZ) / N.AZ
+    
+    // Normal to triangle ABC
+    Vector N = U(cross(V(A,C), V(B,C)));
+    
+    // Obtain the vectors needed for the calculation
+    Point Z = L(A, 0.5, D);
+    Vector AP = V(A, P);
+    Vector AZ = V(A, Z);
+    
+    // Compute the location of Q, the circumcenter of the sphere
+    float s = (dot(AZ, AZ) - dot(AP, AZ)) / dot(N, AZ);
+    return P(P, s, N);
+
+}
+
+Set<Edge> triangulate2to2(Points floor, Points ceil) {
+  Set<Edge> edges = new HashSet();
+
   // Find every triplet of points in the pointset
   for (int a = 0; a < floor.nv; a++) {
     for (int b = a + 1; b < floor.nv; b++) {
@@ -31,8 +88,8 @@ void triangulate2to2(Points floor, color floorColor, Points ceil, color ceilColo
           Point C = ceil.G.get(c);
           Point D = ceil.G.get(d);
           
-          Point P = circumcenter(A, B, C);
-          Point Q = computeCircumsphereCenter(P,A,B,C,D);
+          Point P = circumcircleCenter(A, B, C);
+          Point Q = circumsphereCenter(P,A,B,C,D);
           float minRadius = min(min(d(A, Q), d(B, Q), d(C, Q)), d(D, Q));
           
           boolean foundInside = false;
@@ -60,10 +117,12 @@ void triangulate2to2(Points floor, color floorColor, Points ceil, color ceilColo
           if (foundInside)
             continue;
           
-          drawTriangle(A, B, C, floorColor);
-          drawTriangle(A, B, D, floorColor);
-          drawTriangle(A, C, D, ceilColor);
-          drawTriangle(B, C, D, ceilColor);
+          edges.add(edgeFloorFloor(a, b));
+          edges.add(edgeFloorCeiling(a, c));
+          edges.add(edgeFloorCeiling(a, d));
+          edges.add(edgeFloorCeiling(b, c));
+          edges.add(edgeFloorCeiling(b, d));
+          edges.add(edgeCeilingCeiling(c, d));
           
           if (b4)
             drawTetrahedron(A, B, C, D);
@@ -71,9 +130,20 @@ void triangulate2to2(Points floor, color floorColor, Points ceil, color ceilColo
       }
     }
   }
+  
+  return edges;
 }
   
-void triangulate(Points floor, color floorColor, Points ceil, color ceilColor, color betweenColor) {
+Set<Edge> triangulate(Points floor, Points ceil, boolean flip) {
+  Set<Edge> edges = new HashSet();
+  
+  // Used to keep track of whether floor and ceiling indices are flipped
+  if (flip) {
+    Points temp = floor;
+    floor = ceil;
+    ceil = temp;
+  }
+  
   // Find every triplet of points in the pointset
   for (int a = 0; a < floor.nv; a++) {
     for (int b = a + 1; b < floor.nv; b++) {
@@ -82,7 +152,7 @@ void triangulate(Points floor, color floorColor, Points ceil, color ceilColor, c
         Point B = floor.G.get(b);
         Point C = floor.G.get(c);
         
-        Point P = circumcenter(A, B, C);
+        Point P = circumcircleCenter(A, B, C);
         float circumCircleRadius = min(d(A, P), d(B, P), d(C, P));
         
         // Find all other points and determine if they lie in this circumcenter (skip if so)
@@ -94,12 +164,33 @@ void triangulate(Points floor, color floorColor, Points ceil, color ceilColor, c
         
         if (foundInside)
           continue;
-  
-        drawTriangle(A, B, C, floorColor);
+          
+        if (flip) {
+          edges.add(edgeCeilingCeiling(a, b));
+          edges.add(edgeCeilingCeiling(b, c));
+          edges.add(edgeCeilingCeiling(c, a));
+        }
+        else {
+          edges.add(edgeFloorFloor(a, b));
+          edges.add(edgeFloorFloor(b, c));
+          edges.add(edgeFloorFloor(c, a));
+        }
 
-        Point D = findClosestPointOnCeilingUsingBulge(P, ceil);
-        if (D != null) {
-          drawInterlevelBeams(A, B, C, D, betweenColor);
+        int d = findClosestPointOnCeilingUsingBulge(P, ceil);
+        
+        if (d != -1) {
+          Point D = ceil.G.get(d);
+
+          if (flip) {
+            edges.add(edgeCeilingFloor(a, d));
+            edges.add(edgeCeilingFloor(b, d));
+            edges.add(edgeCeilingFloor(c, d));
+          } 
+          else {
+            edges.add(edgeFloorCeiling(a, d));
+            edges.add(edgeFloorCeiling(b, d));
+            edges.add(edgeFloorCeiling(c, d));
+          }
           
           if (b4)
             drawTetrahedron(A, B, C, D);
@@ -107,52 +198,27 @@ void triangulate(Points floor, color floorColor, Points ceil, color ceilColor, c
       }
     }
   }
+  
+  return edges;
 }
 
-Point findClosestPointOnCeilingUsingBulge(Point P, Points ceiling){
+int findClosestPointOnCeilingUsingBulge(Point P, Points ceiling){
   
   // assumes that both the planes are parallel. will have to resort to O(n^2) approach for non parallel planes
   if(ceiling.nv == 0){
     //throw new RuntimeException("No points in ceiling");
-    return null;
+    return -1;
   }
   // projection of P on ceiling plane - just copying x, y values 
   Point PDash = P(P.x, P.y, ceiling.G.get(0).z);
-  Point D = ceiling.G.get(0);
+  int d = 0;
   float minDist =  d(PDash, ceiling.G.get(0));
   for (int i =1; i<ceiling.nv; i++){
     float dist = d(PDash, ceiling.G.get(i));
     if (dist < minDist) {
-      D = ceiling.G.get(i);
+      d = i;
       minDist = dist;
     }
   }
-  return D;  
-}
-
-Point computeCircumsphereCenter(Point P, Point A, Point B, Point C, Point D){
-    // The circumcenter of the sphere is given by Q = P + sN, where
-    //   P is a circumcenter of triangle ABC
-    //   N is the normal to that triangle
-    //
-    // Using the two triangles APQ and ADQ, we can compute Q similar to 
-    // computing the circumcenter of a triangle:
-    //   Q = P + sN
-    //   AQ = AP + sN
-    //   AQ.AZ = AP.AZ + sN.AZ
-    //      (where Z is midpoint of AD, and therefore AQ.AZ == AZ.AZ)
-    //   s = (AZ.AZ - AP.AZ) / N.AZ
-    
-    // Normal to triangle ABC
-    Vector N = U(cross(V(A,C), V(B,C)));
-    
-    // Obtain the vectors needed for the calculation
-    Point Z = L(A, 0.5, D);
-    Vector AP = V(A, P);
-    Vector AZ = V(A, Z);
-    
-    // Compute the location of Q, the circumcenter of the sphere
-    float s = (dot(AZ, AZ) - dot(AP, AZ)) / dot(N, AZ);
-    return P(P, s, N);
-
+  return d;  
 }

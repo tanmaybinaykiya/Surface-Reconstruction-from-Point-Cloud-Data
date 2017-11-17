@@ -22,7 +22,6 @@ color colorWithAlpha(color c, float alpha) {
   return color(red(c), green(c), blue(c), alpha);
 }
   
-  
 
 void drawCircumcircle(Point P, Point A, Point B, Point C, color col, boolean showBeams) {
   // Draw the components
@@ -38,7 +37,6 @@ void drawCircumcircle(Point P, Point A, Point B, Point C, color col, boolean sho
 
 void drawCircumsphere(Point Q, Point A, Point B, Point C, Point D, color col, boolean showBeams) {
   // Draw the components
-  
   if (showBeams) {
     beam(A, Q, rt / 5);
     beam(B, Q, rt / 5);
@@ -56,11 +54,6 @@ void drawTriangle(Point A, Point B, Point C, color floorColor){
   beam(A, B, rt);
   beam(A, C, rt);
   beam(B, C, rt);
-  
-  //fill(color(red(floorColor), green(floorColor), blue(floorColor), 50));
-  //beginShape();
-  //v(A); v(B); v(C);
-  //endShape(CLOSE);
 }
 
 void drawInterlevelBeams(Point A, Point B, Point C, Point D, color betweenColor){
@@ -68,17 +61,6 @@ void drawInterlevelBeams(Point A, Point B, Point C, Point D, color betweenColor)
   beam(A, D, rt);
   beam(B, D, rt);
   beam(C, D, rt);
-  
-  //fill(color(red(betweenColor), green(betweenColor), blue(betweenColor), 50));
-  //beginShape(TRIANGLE_STRIP);
-  //v(A); v(B); v(C); v(D);
-  //v(A); v(B); v(D);
-  //v(C); v(B);
-  //endShape(CLOSE);
-  
-  //beginShape(); v(A); v(B); v(D); endShape(CLOSE);
-  //beginShape(); v(A); v(C); v(D); endShape(CLOSE);
-  //beginShape(); v(B); v(C); v(D); endShape(CLOSE);
 }
 
 void drawTetrahedron(Point A, Point B, Point C, Point D) {
@@ -98,4 +80,28 @@ void drawTetrahedron(Point A, Point B, Point C, Point D) {
   v(A); v(B); v(D);
   v(C); v(B);
   endShape(CLOSE);
+}
+
+void drawEdgeSet(Set<Edge> edges, Points floor, Points ceil, color floorColor, color ceilColor, color betweenColor) {
+  /*
+   * Each edge has two vertex IDs; a positive ID is on the floor, a negative ID is on the ceiling.
+   * These IDs also start at 1 (and -1), so they must be adjusted accordingly
+   */
+   
+  for (Edge edge : edges) {
+    color col;
+    
+    if (edge.first > 0 && edge.second > 0)
+      col = floorColor;
+    else if (edge.first < 0 && edge.second < 0)
+      col = ceilColor;
+    else
+      col = betweenColor;
+      
+    Point first = (edge.first > 0) ? floor.G.get(edge.first - 1) : ceil.G.get(-1*edge.first - 1);
+    Point second = (edge.second > 0) ? floor.G.get(edge.second - 1) : ceil.G.get(-1*edge.second - 1);
+    
+    fill(col);
+    beam(first, second, rt);
+  }
 }
