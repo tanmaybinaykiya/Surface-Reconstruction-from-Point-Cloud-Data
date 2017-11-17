@@ -20,7 +20,8 @@ Boolean
   flipped = false,
   b1 = false,
   b2 = false,
-  b3 = false;
+  b3 = false,
+  b4 = false;
 float 
  h_floor=0, h_ceiling=600,  h=h_floor,
   t=0, 

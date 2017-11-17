@@ -64,6 +64,9 @@ void triangulate2to2(Points floor, color floorColor, Points ceil, color ceilColo
           drawTriangle(A, B, D, floorColor);
           drawTriangle(A, C, D, ceilColor);
           drawTriangle(B, C, D, ceilColor);
+          
+          if (b4)
+            drawTetrahedron(A, B, C, D);
         }
       }
     }
@@ -97,6 +100,9 @@ void triangulate(Points floor, color floorColor, Points ceil, color ceilColor, c
         Point D = findClosestPointOnCeilingUsingBulge(P, ceil);
         if (D != null) {
           drawInterlevelBeams(A, B, C, D, betweenColor);
+          
+          if (b4)
+            drawTetrahedron(A, B, C, D);
         }
       }
     }
@@ -124,36 +130,6 @@ Point findClosestPointOnCeilingUsingBulge(Point P, Points ceiling){
   return D;  
 }
 
-void drawTriangle(Point A, Point B, Point C, color floorColor){
-  fill(floorColor);
-  beam(A, B, rt);
-  beam(A, C, rt);
-  beam(B, C, rt);
-  
-  //fill(color(red(floorColor), green(floorColor), blue(floorColor), 50));
-  //beginShape();
-  //v(A); v(B); v(C);
-  //endShape(CLOSE);
-}
-
-void drawInterlevelBeams(Point A, Point B, Point C, Point D, color betweenColor){
-  fill(betweenColor);
-  beam(A, D, rt);
-  beam(B, D, rt);
-  beam(C, D, rt);
-  
-  //fill(color(red(betweenColor), green(betweenColor), blue(betweenColor), 50));
-  //beginShape(TRIANGLE_STRIP);
-  //v(A); v(B); v(C); v(D);
-  //v(A); v(B); v(D);
-  //v(C); v(B);
-  //endShape(CLOSE);
-  
-  //beginShape(); v(A); v(B); v(D); endShape(CLOSE);
-  //beginShape(); v(A); v(C); v(D); endShape(CLOSE);
-  //beginShape(); v(B); v(C); v(D); endShape(CLOSE);
-}
-
 Point computeCircumsphereCenter(Point P, Point A, Point B, Point C, Point D){
     // The circumcenter of the sphere is given by Q = P + sN, where
     //   P is a circumcenter of triangle ABC
@@ -179,31 +155,4 @@ Point computeCircumsphereCenter(Point P, Point A, Point B, Point C, Point D){
     float s = (dot(AZ, AZ) - dot(AP, AZ)) / dot(N, AZ);
     return P(P, s, N);
 
-}
-
-void drawCircumcircle(Point P, Point A, Point B, Point C, color col, boolean showBeams) {
-  // Draw the components
-  fill(col);
-  show(P, rb / 5);  // circumcenter
-  
-  if (showBeams) {
-    beam(A, P, rt / 5);
-    beam(B, P, rt / 5);
-    beam(C, P, rt / 5);
-  }
-}
-
-void drawCircumsphere(Point Q, Point A, Point B, Point C, Point D, color col, boolean showBeams) {
-  // Draw the components
-  
-  if (showBeams) {
-    beam(A, Q, rt / 5);
-    beam(B, Q, rt / 5);
-    beam(C, Q, rt / 5);
-    beam(D, Q, rt / 5);
-  }
-  
-  float sphereRadius = min(min(d(A,Q), d(B,Q), d(C,Q)), d(D,Q));
-  fill(alphagrey);
-  show(Q, sphereRadius);
 }

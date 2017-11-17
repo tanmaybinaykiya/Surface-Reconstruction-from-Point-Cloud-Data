@@ -27,6 +27,7 @@ void keyPressed()
   if(key=='1') b1 = !b1;
   if(key=='2') b2 = !b2;
   if(key=='3') b3 = !b3;
+  if(key=='4') b4 = !b4;
   change=true;   // to save a frame for the movie when user pressed a key 
   }
 
@@ -85,10 +86,12 @@ void displayHeader()  // Displays title and authors face on screen
     }
 void displayFooter()  // Displays help text at the bottom
     {
+    scribeFooter(extra,2);
     scribeFooter(guide,1); 
     scribeFooter(menu,0); 
     }
 
 String title ="Lattice Maker", name ="TEAM NAMES",
        menu="?:help, t/T:move view, space:rotate view, `/wheel:zoom, !:picture, ~:(start/stop) filming,  #:quit",
-       guide="click&drag:pick&slide, f:flip ceiling/floor, x/X:move picked/all, p/P:perturb, X:slide All, |:snap heights, l/L:load, w/W:write"; // user's guide
+       guide="click&drag:pick&slide, f:flip ceiling/floor, x/X:move picked/all, p/P:perturb, X:slide All, |:snap heights, l/L:load, w/W:write", // user's guide
+       extra="1:show 1-3 tets, 2:show 2-2 tets, 3:show 3-1 tets, 4:fill small tets";

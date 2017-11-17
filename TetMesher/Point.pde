@@ -1,6 +1,8 @@
+import java.util.Objects;
+
 class Point 
-   { 
-     float x=0,y=0,z=0; 
+ { 
+   float x=0,y=0,z=0; 
    Point () {}; 
    Point (float px, float py) {x = px; y = py;};
    Point (float px, float py, float pz) {x = px; y = py; z = pz; };
@@ -16,5 +18,9 @@ class Point
    Point mul(float f) {x*=f; y*=f; z*=f; return this;};
    Point div(float f) {x/=f; y/=f; z/=f; return this;};
    Point div(int f) {x/=f; y/=f; z/=f; return this;};
+   
+   int hashCode() {
+     return Objects.hash(this.x, this.y, this.z);
    }
+ }
    
