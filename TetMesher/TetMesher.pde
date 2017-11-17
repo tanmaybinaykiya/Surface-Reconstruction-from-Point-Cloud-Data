@@ -60,39 +60,25 @@ void draw() {
   doPick(); // sets Of and axes for 3D GUI (see pick Tab)
   R.SETppToIDofVertexWithClosestScreenProjectionTo(Mouse()); // for picking (does not set P.pv)
  
-    
-  //fill(orange); Q.drawBalls(30);
-  //fill(green); P.drawBalls(30);  
   if(showBalls) 
-    {
+  {
     fill(orange); P.drawBalls(rb);
     fill(green); Q.drawBalls(rb);  
     fill(red,100); R.showPicked(rb+5); 
-    }
+  }
     
-  if(showTube) 
-    {
-    //fill(grey); beam(P.G[0],Q.G[0],rt);
-    //fill(orange); beam(P.G[0],P.G[1],rt);
-    //fill(green); beam(Q.G[0],Q.G[1],rt);
-    }
+  if(showTube) { }
     
   Set<Edge> edges = new HashSet();
     
-  if (b1) {
-    // 1-3
+  if (b1) // 1-3
     edges.addAll(triangulate(P, Q, true));
-  }
   
-  if (b2) {
-    // 2-2
+  if (b2) // 2-2
     edges.addAll(triangulate2to2(P, Q));
-  }
     
-  if (b3) {
-    // 3-1
+  if (b3) // 3-1
     edges.addAll(triangulate(P, Q, false));
-  }
     
   // Draw all of the edges
   drawEdgeSet(edges, P, Q, green, orange, grey);
