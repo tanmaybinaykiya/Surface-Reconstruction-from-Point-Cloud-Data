@@ -98,8 +98,8 @@ void drawEdgeSet(Set<Edge> edges, Points floor, Points ceil, color floorColor, c
     else
       col = betweenColor;
       
-    Point first = (edge.first > 0) ? floor.G.get(edge.first - 1) : ceil.G.get(-1*edge.first - 1);
-    Point second = (edge.second > 0) ? floor.G.get(edge.second - 1) : ceil.G.get(-1*edge.second - 1);
+    Point first = edge.getFirstPoint(floor, ceil);
+    Point second = edge.getSecondPoint(floor, ceil);
     
     fill(col);
     beam(first, second, rt);

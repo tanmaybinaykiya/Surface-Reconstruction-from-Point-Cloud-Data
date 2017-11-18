@@ -36,6 +36,8 @@ Points P = new Points(); // polyloop in 3D
 Points Q = new Points(); // second polyloop in 3D
 Points R, S; 
     
+Set<Edge> edges = new HashSet();
+List<EquilateralMesh> sampledMeshes = new ArrayList();
 
 void setup() {
   myFace = loadImage("data/pic.jpg");  // load image from file pic.jpg in folder data *** replace that file with your pic of your own face
@@ -49,7 +51,10 @@ void setup() {
   noSmooth();
   frameRate(30);
   R=P; S=Q;
-  }
+  
+  // Re-render initially
+  change = true;
+}
 
 void draw() {
   background(255);
@@ -67,21 +72,47 @@ void draw() {
     fill(red,100); R.showPicked(rb+5); 
   }
     
-  if(showTube) { }
+  /*********************************
+   * Part 1: Triangulate the mesh
+   *********************************/
+  if (change) {
+    // Re-calculate triangulation
+    edges = new HashSet();
+      
+    if (b1) // 1-3
+      edges.addAll(triangulate(P, Q, true));
     
-  Set<Edge> edges = new HashSet();
+    if (b2) // 2-2
+      edges.addAll(triangulate2to2(P, Q));
+      
+    if (b3) // 3-1
+      edges.addAll(triangulate(P, Q, false));
+  }
     
-  if (b1) // 1-3
-    edges.addAll(triangulate(P, Q, true));
+  if (showTube) {
+    // Draw all of the edges
+    drawEdgeSet(edges, P, Q, green, orange, grey);
+  }
   
-  if (b2) // 2-2
-    edges.addAll(triangulate2to2(P, Q));
+  /*********************************
+   * Part 2: Approximate the mesh
+   *********************************/
+  if (change) {
+    // Re-calculate the approximations
+    sampledMeshes = new ArrayList();
     
-  if (b3) // 3-1
-    edges.addAll(triangulate(P, Q, false));
-    
-  // Draw all of the edges
-  drawEdgeSet(edges, P, Q, green, orange, grey);
+    for (Edge edge : edges) {
+      sampledMeshes.add(samplePointsOnBeam(edge, P, Q, rt, true));
+    }
+  }
+  
+  fill(white);
+  stroke(black);
+  strokeWeight(1);
+  for (EquilateralMesh mesh : sampledMeshes) {
+    mesh.draw();
+  }
+  
   
   popMatrix(); // done with 3D drawing. Restore front view for writing text on canvas
   hint(DISABLE_DEPTH_TEST); // no z-buffer test to ensure that help text is visible

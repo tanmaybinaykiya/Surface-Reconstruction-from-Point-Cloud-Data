@@ -15,6 +15,14 @@ public class Edge {
     this.second = max(vertex1, vertex2);
   }
   
+  public Point getFirstPoint(Points floor, Points ceil) {
+    return (this.first > 0) ? floor.G.get(this.first - 1) : ceil.G.get(-1*this.first - 1);
+  }
+  
+  public Point getSecondPoint(Points floor, Points ceil) {
+    return (this.second > 0) ? floor.G.get(this.second - 1) : ceil.G.get(-1*this.second - 1);
+  }
+  
   public boolean equals(Edge other) {
     return this.first == other.first && this.second == other.second;
   }
