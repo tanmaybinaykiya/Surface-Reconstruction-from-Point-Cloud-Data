@@ -34,7 +34,9 @@ void keyPressed()
 void mouseWheel(MouseEvent event) 
   {
   dz -= event.getAmount(); 
-  change=true;
+  
+  // Don't change anything here since no points are modified
+  //change=true;
   }
 
 void mousePressed() 
@@ -53,7 +55,9 @@ void mouseMoved()
   //if (!keyPressed) 
   if (keyPressed && key==' ') {rx-=PI*(mouseY-pmouseY)/height; ry+=PI*(mouseX-pmouseX)/width;};
   if (keyPressed && key=='`') dz+=(float)(mouseY-pmouseY); // approach view (same as wheel)
-  change=true;
+  
+  // Don't change anything here since no points are modified
+  //change=true;
   }
   
 void mouseDragged() 

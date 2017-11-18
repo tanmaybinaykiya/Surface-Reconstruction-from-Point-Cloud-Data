@@ -35,7 +35,7 @@ class EquilateralMesh {
   }
 }
 
-EquilateralMesh samplePointsOnBeam(Edge edge, Points floor, Points ceil, float radius, boolean drawMesh) {
+EquilateralMesh samplePointsOnBeam(Edge edge, Points floor, Points ceil, float radius) {
   List<List<Point>> layers = new ArrayList();
   
   // Uniformly sample points around an edge beam for triangulation
@@ -49,7 +49,7 @@ EquilateralMesh samplePointsOnBeam(Edge edge, Points floor, Points ceil, float r
   
   // Compute the parameters for going around and along the beam
   float angleTotal = 2*PI;
-  float angleStepNum = 12;
+  float angleStepNum = 9;
   float angleStepEach = angleTotal / angleStepNum;
   
   float lengthTotal = d(P, Q);
@@ -77,4 +77,9 @@ EquilateralMesh samplePointsOnBeam(Edge edge, Points floor, Points ceil, float r
   }
   
   return new EquilateralMesh(layers);
+}
+
+EquilateralMesh samplePointsOnSphere(Point P, float radius) {
+  // TODO: Implement so that you get nicely spaced equilateral triangles around the sphere
+  return new EquilateralMesh(new ArrayList());
 }

@@ -101,8 +101,19 @@ void draw() {
     // Re-calculate the approximations
     sampledMeshes = new ArrayList();
     
+    // Floor
+    for (Point S : P.G) {
+      sampledMeshes.add(samplePointsOnSphere(S, rb));
+    }
+    
+    // Ceiling
+    for (Point S : Q.G) {
+      sampledMeshes.add(samplePointsOnSphere(S, rb));
+    }
+    
+    // Beams
     for (Edge edge : edges) {
-      sampledMeshes.add(samplePointsOnBeam(edge, P, Q, rt, true));
+      sampledMeshes.add(samplePointsOnBeam(edge, P, Q, rt));
     }
   }
   
