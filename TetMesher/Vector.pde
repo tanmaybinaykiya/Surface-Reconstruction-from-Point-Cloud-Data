@@ -27,5 +27,7 @@ class Vector {
      add(x*c-x-y*s,I); add(x*s+y*c-y,J); 
      return this; 
      } 
-   } // end class vec
+  String toString(){return "["+x+", "+y+", "+z+"]";}
+} // end class vec
+   
   

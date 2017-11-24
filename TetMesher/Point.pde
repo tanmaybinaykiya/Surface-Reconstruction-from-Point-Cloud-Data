@@ -22,5 +22,9 @@ class Point
    public int hashCode() {
      return Objects.hash(this.x, this.y, this.z);
    }
+   
+   public String toString(){
+     return "P["+ x + ", " + y+ ", "+z+"]";
+   }
  }
    

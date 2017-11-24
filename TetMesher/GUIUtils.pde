@@ -15,8 +15,6 @@ void scribeFooter(String S, int i) {fill(0); text(S,10,height-50-i*20); noFill()
 void scribeAtMouse(String S) {fill(0); text(S,mouseX,mouseY); noFill();} // writes on screen near mouse
 void scribeMouseCoordinates() {fill(black); text("("+mouseX+","+mouseY+")",mouseX+7,mouseY+25); noFill();}
 
-
-
 FIFO _LookAtPt = new FIFO();
 
 class FIFO // class for filtering camera motion
