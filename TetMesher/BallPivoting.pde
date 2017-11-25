@@ -71,3 +71,41 @@ Point ballPivot(Point A, Point B, Point C, Points P, float r) {
   
   return bestPoint;
 }
+
+Point ballPivot(int aCornerIndex, int bCornerIndex, int cCornerIndex, List<Point> P, float r) {
+  
+  int aIndex = corners.get(aCornerIndex), 
+    bIndex = corners.get(bCornerIndex),
+    cIndex = corners.get(cCornerIndex);
+    
+  float bestAngle = Float.MAX_VALUE;
+  Point bestPoint = null;
+  
+  // AB
+  for (int dIndex=0; dIndex <P.size(); dIndex++) {
+    Point A  = P.get(aIndex);
+    Point B  = P.get(bIndex);
+    Point C  = P.get(cIndex);
+    Point D  = P.get(dIndex);
+    if(A != D && B!=D && C!=D){
+      float angle = pivotAngle(A, B, C, D, r);
+      
+      if (angle < bestAngle) {
+        bestAngle = angle;
+        bestPoint = D;
+      }
+    }
+    generatedTriangles.add(new Triangle(aIndex, bIndex, dIndex));
+    
+    int triangleIndex = generatedTriangles.size();
+    corners.put(triangleIndex * 3, aIndex);
+    corners.put(triangleIndex * 3 + 1, bIndex);
+    corners.put(triangleIndex * 3 + 2, dIndex);
+    
+    opposites.put(cCornerIndex, triangleIndex * 3 + 2);
+    opposites.put(triangleIndex * 3 + 2, cCornerIndex);
+
+  }
+  
+  return bestPoint;
+}

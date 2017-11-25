@@ -38,6 +38,12 @@ Points R, S;
 
 Set<Edge> edges;
 List<EquilateralMesh> sampledMeshes;
+List<Point> pointCloud;
+
+List<Triangle> generatedTriangles ;
+Map<Integer, Integer> corners;   // cornerId to vertexId ; corner /3 == triangleId 
+Map<Integer, Integer> opposites;  // corner id to corner id 
+
 
 void setup() {
   
@@ -58,12 +64,17 @@ void setup() {
   
   edges = new HashSet();
   sampledMeshes = new ArrayList();
-
+  pointCloud = new ArrayList();
+  generatedTriangles = new ArrayList();
+  corners = new HashMap();
+  
   // Re-render initially
   change = true;
   
-  //reTriangulate();
-  //resample();
+  reTriangulate();
+  resample();
+  
+
   
   //sampledMeshes.add(testSamplePointsOnSphere());
 }
@@ -216,5 +227,11 @@ void resample(){
   // Beams
   for (Edge edge : edges) {
     sampledMeshes.add(samplePointsOnBeam(edge, P, Q, rt));
+  }
+  
+  pointCloud.clear();
+  
+  for (EquilateralMesh mesh: sampledMeshes){
+    pointCloud.addAll(mesh.getAllPoints());
   }
 }
