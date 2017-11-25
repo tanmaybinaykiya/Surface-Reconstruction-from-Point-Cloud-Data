@@ -62,8 +62,8 @@ void setup() {
   // Re-render initially
   change = true;
   
-  reTriangulate();
-  resample();
+  //reTriangulate();
+  //resample();
   
   //sampledMeshes.add(testSamplePointsOnSphere());
 }
@@ -86,43 +86,67 @@ void draw() {
   showFloor(h); // draws dance floor as yellow mat
   doPick(); // sets Of and axes for 3D GUI (see pick Tab)
   R.SETppToIDofVertexWithClosestScreenProjectionTo(Mouse()); // for picking (does not set P.pv)
-
-  //if (showBalls) 
-  //{
-  //  fill(orange); 
-  //  P.drawBalls(rb);
-  //  fill(green); 
-  //  Q.drawBalls(rb);  
-  //  fill(red, 100); 
-  //  R.showPicked(rb+5);
-  //}
+  //hint(DISABLE_DEPTH_TEST);
+  
+  if (showBalls) 
+  {
+    fill(orange); 
+    P.drawBalls(rb);
+    fill(green); 
+    Q.drawBalls(rb);  
+    fill(red, 100); 
+    R.showPicked(rb+5);
+  }
+  
+  float r = 600;
+  Point A = Q.G.get(0), B = Q.G.get(1), C = Q.G.get(2);
+  //Point D1 = P.G.get(0), D2 = P.G.get(1);
+  
+  //float angle1 = pivotAngle(B, C, A, D1, r);
+  //float angle2 = pivotAngle(B, C, A, D2, r);
+  //Point D = (angle1 < angle2 ? D1 : D2);
+  
+  //Point centerABC = centerOfBall(A, B, C, r);
+  //Point centerCBD = centerOfBall(C, B, D, r);
+  
+  //drawBallCenter(A, B, C, centerABC, r, blue);
+  //drawBallCenter(C, B, D, centerCBD, r, orange);
+  
+  Point D1 = ballPivot(A, B, C, P, r);
+  Point D2 = ballPivot(B, C, A, P, r);
+  Point D3 = ballPivot(C, A, B, P, r);
+  
+  drawBallCenter(A, B, C, centerOfBall(A, B, C, r), r, blue);
+  drawBallCenter(B, A, D1, centerOfBall(B, A, D1, r), r, red);
+  drawBallCenter(C, B, D2, centerOfBall(C, B, D2, r), r, green);
+  drawBallCenter(A, C, D3, centerOfBall(A, C, D3, r), r, orange);
 
   /*********************************
    * Part 1: Triangulate the mesh
    *********************************/
-  if (change) {
-    reTriangulate();
-  }
+  //if (change) {
+  //  reTriangulate();
+  //}
 
-  if (showTube) {
-    // Draw all of the edges
-    drawEdgeSet(edges, P, Q, green, orange, grey);
-  }
+  //if (showTube) {
+  //  // Draw all of the edges
+    //drawEdgeSet(edges, P, Q, green, orange, grey);
+  //}
 
-  /*********************************
-   * Part 2: Approximate the mesh
-   *********************************/
-  if (change) {
-    // Re-calculate the approximations
-    resample();
-  }
+  ///*********************************
+  // * Part 2: Approximate the mesh
+  // *********************************/
+  //if (change) {
+  //  // Re-calculate the approximations
+  //  resample();
+  //}
 
-  fill(white);
-  stroke(black);
-  strokeWeight(1);
-  for (EquilateralMesh mesh : sampledMeshes) {
-    mesh.draw();
-  }
+  //fill(white);
+  //stroke(black);
+  //strokeWeight(1);
+  //for (EquilateralMesh mesh : sampledMeshes) {
+  //  mesh.draw();
+  //}
   
   popMatrix(); // done with 3D drawing. Restore front view for writing text on canvas
   hint(DISABLE_DEPTH_TEST); // no z-buffer test to ensure that help text is visible
