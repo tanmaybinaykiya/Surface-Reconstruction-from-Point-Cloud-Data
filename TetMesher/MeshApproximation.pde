@@ -12,7 +12,7 @@ EquilateralMesh samplePointsOnBeam(Edge edge, Points floor, Points ceil, float r
   
   // Compute the parameters for going around and along the beam
   float angleTotal = 2*PI;
-  float angleStepNum = 16;
+  float angleStepNum = 6;
   float angleStepEach = angleTotal / angleStepNum;
   
   float lengthTotal = d(P, Q);
@@ -44,7 +44,7 @@ EquilateralMesh samplePointsOnBeam(Edge edge, Points floor, Points ceil, float r
 
 EquilateralMesh samplePointsOnSphere(Point P, float radius) {
   
-  float someConst = 20;
+  float someConst = 5;
   
   println("samplePointsOnSphere: r", radius, P);
   // TODO: Implement so that you get nicely spaced equilateral triangles around the sphere
@@ -52,7 +52,7 @@ EquilateralMesh samplePointsOnSphere(Point P, float radius) {
   Vector i = V(1, 0, 0);
   Vector j = V(0, 1, 0);
   Vector k = V(0, 0, 1);
-  for (float r = -radius; r <= radius; r += 5){
+  for (float r = -radius; r <= radius; r += 8){
     float thisRadius = sqrt(radius*radius - r*r);
     float dTheta = PI/someConst; // L / (thisRadius * 3);
 

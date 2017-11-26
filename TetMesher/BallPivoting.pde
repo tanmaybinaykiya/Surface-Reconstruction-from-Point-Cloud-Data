@@ -161,6 +161,13 @@ void ballPivot(List<Point> P, float r){
     }
     
     int nextTriangleIndex = ballPivot(aCornerIndex, bCornerIndex, cornerIndex, P, r);
+    
+    if (nextTriangleIndex == -1) {
+      println("Did not find next triangle");
+      return;
+    }
+    
+    println("a:", aCornerIndex, "b:", bCornerIndex, "corner:", cornerIndex);
     println("New Triangle::", generatedTriangles.get(nextTriangleIndex));
 
     if( count == limit){
@@ -197,8 +204,8 @@ int ballPivot(int aCornerIndex, int bCornerIndex, int cCornerIndex, List<Point> 
     cIndex = corners.get(cCornerIndex);
     
   float bestAngle = Float.MAX_VALUE;
-  int bestPointIndex = -1;
-  //println("here2 ");
+  int bestPointIndex = -30;
+  println("here2 ", bestAngle, Float.MAX_VALUE);
   
   // AB
   Point A  = P.get(aIndex);
@@ -214,19 +221,29 @@ int ballPivot(int aCornerIndex, int bCornerIndex, int cCornerIndex, List<Point> 
     if(aIndex != dIndex && bIndex != dIndex){ // let c match d - if we pivot to c we dont create the triangle 
       float angle = pivotAngle(A, B, C, D, r);
       
-    //println("here6 ");
+      //println("here6: ", angle, bestAngle, bestPointIndex);
       if (angle < bestAngle) {
+        println("here6.1: ", angle, bestAngle, bestPointIndex);
+
         bestAngle = angle;
         bestPointIndex = dIndex;
       }
     }
     
   }
+     
+           println("here6.bbb: ",bestAngle, bestPointIndex);
+
       //println("here7 ");
 
+  
+  if (bestPointIndex == -30) {
+    return -1;
+  }
+  
   int triangleIndex = getTriangleIndex(aIndex, bIndex, bestPointIndex); 
 
-  if (bestPointIndex != cIndex){
+  if (bestPointIndex != cIndex) {
     int oppositeIndex = getOpposite(aIndex, bIndex, triangleIndex);
   
         //println("here8 ");
@@ -235,7 +252,7 @@ int ballPivot(int aCornerIndex, int bCornerIndex, int cCornerIndex, List<Point> 
     opposites.put(oppositeIndex, cCornerIndex);
   }
         //println("here9 ");
-
+  println("Opposites:", opposites);
   return triangleIndex;
 }
 

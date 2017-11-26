@@ -18,10 +18,10 @@ Boolean
   showVecs=true, 
   showTube=true, 
   flipped = false, 
-  b1 = false, 
-  b2 = false, 
-  b3 = false, 
-  b4 = false;
+  b1 = true, 
+  b2 = true, 
+  b3 = true, 
+  b4 = true;
 float 
   h_floor=0, h_ceiling=600, h=h_floor, 
   t=0, 
@@ -62,6 +62,9 @@ void setup() {
   R=P; 
   S=Q;
   
+  edges = new HashSet();
+  sampledMeshes = new ArrayList();
+  pointCloud = new ArrayList();
   resetAll();
   
   // Re-render initially
@@ -70,14 +73,16 @@ void setup() {
   //reTriangulate();
   //resample();
   
+  
+    
 
   
   //sampledMeshes.add(testSamplePointsOnSphere());
 }
 
 void resetAll(){
-  edges = new HashSet();
-  sampledMeshes = new ArrayList();
+  //edges = new HashSet();
+  //sampledMeshes = new ArrayList();
   pointCloud = new ArrayList();
   generatedTriangles = new ArrayList();
   corners = new HashMap();
@@ -85,13 +90,13 @@ void resetAll(){
   vertexTriangleMapping = new HashMap();
 }
 
-void draw(){
+void draw(){  
   background(255);
   hint(ENABLE_DEPTH_TEST); 
   //pushMatrix();   // to ensure that we can restore the standard view before writing on the canvas
   setView();  // see pick tab
-  //showFloor(h); // draws dance floor as yellow mat
-  //doPick(); // sets Of and axes for 3D GUI (see pick Tab)
+  showFloor(h); // draws dance floor as yellow mat
+  doPick(); // sets Of and axes for 3D GUI (see pick Tab)
   R.SETppToIDofVertexWithClosestScreenProjectionTo(Mouse()); // for picking (does not set P.pv)
   //hint(DISABLE_DEPTH_TEST);
   
@@ -103,11 +108,31 @@ void draw(){
     fill(red, 100); 
     R.showPicked(rb+5);
   }
+    
+  float r = 750;
+  //int seedTriangleIndex = getSeedTriangleIndex(pointCloud, r);
+  //Triangle seedTriangle = generatedTriangles.get(seedTriangleIndex);
+  ////println("Seed index:", seedTriangleIndex, "Seed:", seedTriangle);
   
-  float r = 600;
+  ////drawBallCenter(seedTriangle, r, blue);
+  
+  //fill(blue, 50);
+  //show(pointCloud.get(seedTriangle.aIndex), 30);
+  //fill(green, 50);show(pointCloud.get(seedTriangle.bIndex), 30);
+  //fill(red, 50);show(pointCloud.get(seedTriangle.cIndex), 30);
+  
+  
+  //fill(red);
+  //seedTriangle.drawMe(); 
+
+  
+  //fill(white);
+  //stroke(black);
+  //strokeWeight(1);
+  //for (EquilateralMesh mesh : sampledMeshes)
+  //mesh.draw();
   
   resetAll();
-  
   for (int i =0; i<P.nv; i++){
     pointCloud.add(P.G.get(i));
   }
@@ -115,14 +140,11 @@ void draw(){
     pointCloud.add(Q.G.get(i));
   }
   
-  //int seedTriangleIndex = getSeedTriangleIndex(pointCloud, r);
-  //drawBallCenter(generatedTriangles.get(seedTriangleIndex), r, blue);
-  //generatedTriangles.get(seedTriangleIndex).drawMe(); 
-  
+  println("Points:", pointCloud.size());
   ballPivot(pointCloud, r);
   strokeWeight(2);
   stroke(black);
-  fill(pink, 10);
+  fill(pink, 150);
   for (Triangle t: generatedTriangles){
     t.drawMe();
   }
@@ -262,17 +284,17 @@ void reTriangulate(){
 void resample(){
   sampledMeshes.clear();
 
-   //Floor
-  for (int i =0; i<P.nv; i++) {
-    Point S = P.G.get(i);
-    sampledMeshes.add(samplePointsOnSphere(S, rb));
-  }
-
-   //Ceiling
-  for (int i =0; i<Q.nv; i++) {
-    Point S = Q.G.get(i);
-    sampledMeshes.add(samplePointsOnSphere(S, rb));
-  }
+  ////Floor
+  //for (int i =0; i<P.nv; i++) {
+  //  Point S = P.G.get(i);
+  //  sampledMeshes.add(samplePointsOnSphere(S, rb));
+  //}
+  
+  ////Ceiling
+  //for (int i =0; i<Q.nv; i++) {
+  //  Point S = Q.G.get(i);
+  //  sampledMeshes.add(samplePointsOnSphere(S, rb));
+  //}
 
   // Beams
   for (Edge edge : edges) {
