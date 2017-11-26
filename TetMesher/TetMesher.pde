@@ -29,7 +29,7 @@ float
   rb=30, rt=rb/2; // radius of the balls and tubes
 
 int
-  f=0, maxf=2*30, level=4, method=5;
+  f=0, maxf=2*30, level=4, method=5, limit=0;
 String SDA = "angle";
 float defectAngle=0;
 Points P; // polyloop in 3D
@@ -120,7 +120,9 @@ void draw(){
   //generatedTriangles.get(seedTriangleIndex).drawMe(); 
   
   ballPivot(pointCloud, r);
-  fill(pink);
+  strokeWeight(2);
+  stroke(black);
+  fill(pink, 10);
   for (Triangle t: generatedTriangles){
     t.drawMe();
   }

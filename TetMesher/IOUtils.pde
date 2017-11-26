@@ -8,6 +8,9 @@ void keyPressed()
   if(key=='~') filming=!filming;
   if(key=='.') showBalls=!showBalls;
   if(key=='\\') {showTube=!showTube;} // toggle showing th etubes
+  if(key=='+') limit++;
+  if(key=='-') {limit-- ; if (limit<0) limit =0;}
+
   if(key=='f') {flipped=!flipped; if(flipped) {R=Q; S=P; h=h_ceiling;} else {R=P; S=Q; h=h_floor;}}
   //if(key=='3') {R.resetOnCircle(3,300); }
   //if(key=='4') {R.resetOnCircle(4,400); }

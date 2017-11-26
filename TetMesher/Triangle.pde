@@ -8,12 +8,12 @@ class Triangle{
   
   int hashCode(){
     int hashCode  = Objects.hash(aIndex, bIndex, cIndex);
-    println("hashcode method called", hashCode);
+    //println("hashcode method called", hashCode);
     return hashCode;
   }
   
   boolean equals(Object other){
-    println("Equals method callsed");
+    //println("Equals method callsed");
     if(other instanceof Triangle){
       Triangle othern = (Triangle) other;
       return this.aIndex == othern.aIndex && this.bIndex == othern.bIndex && this.cIndex == othern.cIndex;

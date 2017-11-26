@@ -55,8 +55,8 @@ void drawBallCenter(Triangle t, float r, color c) {
   v(C);
   endShape(CLOSE);
   
-  fill(color(red(c), green(c), blue(c), 50));
-  show(centr, r);
+  //fill(color(red(c), green(c), blue(c), 50));
+  //show(centr, r);
 }
 
 
@@ -130,18 +130,19 @@ void ballPivot(List<Point> P, float r){
   frontier.push(new AbstractMap.SimpleImmutableEntry(firstTriangleIndex, 0));
   frontier.push(new AbstractMap.SimpleImmutableEntry(firstTriangleIndex, 1));
   frontier.push(new AbstractMap.SimpleImmutableEntry(firstTriangleIndex, 2));
-  
+  int count =0;
   // frontier is a stack of (edges- corner) to pivot over
-  while(!frontier.isEmpty()){
+  while(!frontier.isEmpty() && count < limit){
     Map.Entry<Integer, Integer> front = frontier.pop();
     int triangleIndex = front.getKey();
     int cornerIndex = front.getValue();
-    println("tIndx ", triangleIndex, "cIndex ", cornerIndex);
+    println("tIndx ", generatedTriangles.get(triangleIndex), "cIndex ", cornerIndex);
     if(explored.contains(front)){
       continue;
     }
     explored.add(front);
-    println("Still lloking at it");
+    count ++;
+    //println("Still lloking at it");
 
     int aCornerIndex;
     int bCornerIndex;
@@ -160,8 +161,13 @@ void ballPivot(List<Point> P, float r){
     
     int nextTriangleIndex = ballPivot(aCornerIndex, bCornerIndex, cornerIndex, P, r);
     
+    if( count == limit){
+      drawBallCenter(generatedTriangles.get(nextTriangleIndex), r, blue);
+    }
+    
     if (nextTriangleIndex == triangleIndex){
       // we pivoted to ourselves.
+      println("Pivotted to myself");
       continue;
     }
     // pick the remaining 2 edges. add them to frontier if not explored already.
