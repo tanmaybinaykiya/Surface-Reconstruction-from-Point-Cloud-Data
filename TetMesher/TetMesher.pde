@@ -62,12 +62,7 @@ void setup() {
   R=P; 
   S=Q;
   
-  edges = new HashSet();
-  sampledMeshes = new ArrayList();
-  pointCloud = new ArrayList();
-  generatedTriangles = new ArrayList();
-  corners = new HashMap();
-  vertexTriangleMapping = new HashMap();
+  resetAll();
   
   // Re-render initially
   change = true;
@@ -80,13 +75,23 @@ void setup() {
   //sampledMeshes.add(testSamplePointsOnSphere());
 }
 
+void resetAll(){
+  edges = new HashSet();
+  sampledMeshes = new ArrayList();
+  pointCloud = new ArrayList();
+  generatedTriangles = new ArrayList();
+  corners = new HashMap();
+  opposites = new HashMap();
+  vertexTriangleMapping = new HashMap();
+}
+
 void draw(){
   background(255);
   hint(ENABLE_DEPTH_TEST); 
   //pushMatrix();   // to ensure that we can restore the standard view before writing on the canvas
   setView();  // see pick tab
-  showFloor(h); // draws dance floor as yellow mat
-  doPick(); // sets Of and axes for 3D GUI (see pick Tab)
+  //showFloor(h); // draws dance floor as yellow mat
+  //doPick(); // sets Of and axes for 3D GUI (see pick Tab)
   R.SETppToIDofVertexWithClosestScreenProjectionTo(Mouse()); // for picking (does not set P.pv)
   //hint(DISABLE_DEPTH_TEST);
   
@@ -101,7 +106,7 @@ void draw(){
   
   float r = 600;
   
-  pointCloud.clear();
+  resetAll();
   
   for (int i =0; i<P.nv; i++){
     pointCloud.add(P.G.get(i));
@@ -110,9 +115,15 @@ void draw(){
     pointCloud.add(Q.G.get(i));
   }
   
-  int seedTriangleIndex = getSeedTriangleIndex(pointCloud, r);
-  drawBallCenter(generatedTriangles.get(seedTriangleIndex), r, blue);
+  //int seedTriangleIndex = getSeedTriangleIndex(pointCloud, r);
+  //drawBallCenter(generatedTriangles.get(seedTriangleIndex), r, blue);
   //generatedTriangles.get(seedTriangleIndex).drawMe(); 
+  
+  ballPivot(pointCloud, r);
+  fill(pink);
+  for (Triangle t: generatedTriangles){
+    t.drawMe();
+  }
   
 }
 

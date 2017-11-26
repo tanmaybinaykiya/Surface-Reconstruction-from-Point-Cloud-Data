@@ -134,12 +134,14 @@ void ballPivot(List<Point> P, float r){
   // frontier is a stack of (edges- corner) to pivot over
   while(!frontier.isEmpty()){
     Map.Entry<Integer, Integer> front = frontier.pop();
+    int triangleIndex = front.getKey();
+    int cornerIndex = front.getValue();
+    println("tIndx ", triangleIndex, "cIndex ", cornerIndex);
     if(explored.contains(front)){
       continue;
     }
     explored.add(front);
-    int triangleIndex = front.getKey();
-    int cornerIndex = front.getValue();
+    println("Still lloking at it");
 
     int aCornerIndex;
     int bCornerIndex;
@@ -180,25 +182,30 @@ void ballPivot(List<Point> P, float r){
 }
 
 int ballPivot(int aCornerIndex, int bCornerIndex, int cCornerIndex, List<Point> P, float r) {
-  
+  //println("here1 ");
   int aIndex = corners.get(aCornerIndex), 
     bIndex = corners.get(bCornerIndex),
     cIndex = corners.get(cCornerIndex);
     
   float bestAngle = Float.MAX_VALUE;
   int bestPointIndex = -1;
+  //println("here2 ");
   
   // AB
   Point A  = P.get(aIndex);
   Point B  = P.get(bIndex);
   Point C  = P.get(cIndex);
 
+  //println("here3 ");
   for (int dIndex=0; dIndex <P.size(); dIndex++) {
+    //println("here4 ");
     Point D  = P.get(dIndex);
     
+    //println("here5 ");
     if(aIndex != dIndex && bIndex != dIndex){ // let c match d - if we pivot to c we dont create the triangle 
       float angle = pivotAngle(A, B, C, D, r);
       
+    //println("here6 ");
       if (angle < bestAngle) {
         bestAngle = angle;
         bestPointIndex = dIndex;
@@ -206,15 +213,20 @@ int ballPivot(int aCornerIndex, int bCornerIndex, int cCornerIndex, List<Point> 
     }
     
   }
-  
+      //println("here7 ");
+
   int triangleIndex = getTriangleIndex(aIndex, bIndex, bestPointIndex); 
 
   if (bestPointIndex != cIndex){
     int oppositeIndex = getOpposite(aIndex, bIndex, triangleIndex);
   
+        //println("here8 ");
+
     opposites.put(cCornerIndex, oppositeIndex);
     opposites.put(oppositeIndex, cCornerIndex);
   }
+        //println("here9 ");
+
   return triangleIndex;
 }
 
@@ -237,9 +249,11 @@ int getOpposite(int aIndex, int bIndex, int triangleIndex){
 
 int getTriangleIndex(int aIndex, int bIndex, int dIndex){
   Triangle t = new Triangle(aIndex, bIndex, dIndex);
+  //println("vertexTriangleMapping: ", vertexTriangleMapping);
   if(vertexTriangleMapping.containsKey(t)){
     return vertexTriangleMapping.get(t);
   } else {
+    //println("Creating new triangle: ", aIndex, bIndex, dIndex);
     generatedTriangles.add(t);
     int triangleIndex = generatedTriangles.size() - 1;
     vertexTriangleMapping.put(t, triangleIndex);
