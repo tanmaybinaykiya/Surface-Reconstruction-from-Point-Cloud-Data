@@ -7,6 +7,7 @@ class Triangle{
   }
   
   int hashCode(){
-  
+    return Objects.hash(aIndex, bIndex, cIndex);
   }
+  
 }

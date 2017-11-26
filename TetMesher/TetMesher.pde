@@ -43,7 +43,7 @@ List<Point> pointCloud;
 List<Triangle> generatedTriangles ;
 Map<Integer, Integer> corners;   // cornerId to vertexId ; corner /3 == triangleId 
 Map<Integer, Integer> opposites;  // corner id to corner id 
-
+Map<Triangle, Integer> vertexTriangleMapping; // vertex triplet to triangle mapping
 
 void setup() {
   
@@ -67,6 +67,7 @@ void setup() {
   pointCloud = new ArrayList();
   generatedTriangles = new ArrayList();
   corners = new HashMap();
+  vertexTriangleMapping = new HashMap();
   
   // Re-render initially
   change = true;

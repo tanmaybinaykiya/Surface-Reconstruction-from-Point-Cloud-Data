@@ -72,40 +72,137 @@ Point ballPivot(Point A, Point B, Point C, Points P, float r) {
   return bestPoint;
 }
 
-Point ballPivot(int aCornerIndex, int bCornerIndex, int cCornerIndex, List<Point> P, float r) {
+
+void ballPivot(List<Point> P, float r){
+  // pick 3 good points
+  int aIndex = 0 , bIndex = 0 , cIndex = 0; 
+  // create a seed triangle, 
+  int firstTriangleIndex = getTriangleIndex(aIndex, bIndex, cIndex);
+  
+  Stack<Map.Entry<Integer, Integer>> frontier = new Stack();  // triangleIndex and corner to pivot  
+  Set<Map.Entry<Integer, Integer>> explored = new HashSet();
+  
+  
+  frontier.push(new AbstractMap.SimpleImmutableEntry(firstTriangleIndex, 0));
+  frontier.push(new AbstractMap.SimpleImmutableEntry(firstTriangleIndex, 1));
+  frontier.push(new AbstractMap.SimpleImmutableEntry(firstTriangleIndex, 2));
+  
+  // frontier is a stack of (edges- corner) to pivot over
+  while(!frontier.isEmpty()){
+    Map.Entry<Integer, Integer> front = frontier.pop();
+    if(explored.contains(front)){
+      continue;
+    }
+    explored.add(front);
+    int triangleIndex = front.getKey();
+    int cornerIndex = front.getValue();
+
+    int aCornerIndex;
+    int bCornerIndex;
+    
+    if (cornerIndex % 3 == 0){
+      aCornerIndex = triangleIndex*3 + 1;
+      bCornerIndex = triangleIndex*3 + 2;
+    } else if (cornerIndex % 3 == 1) {
+      aCornerIndex = triangleIndex*3;
+      bCornerIndex = triangleIndex*3 + 2;
+    }
+    else {
+      aCornerIndex = triangleIndex*3;
+      bCornerIndex = triangleIndex*3 + 1;
+    }
+    
+    int nextTriangleIndex = ballPivot(aCornerIndex, bCornerIndex, cornerIndex, P, r);
+    
+    if (nextTriangleIndex == triangleIndex){
+      // we pivoted to ourselves.
+      continue;
+    }
+    // pick the remaining 2 edges. add them to frontier if not explored already.
+    
+    int oppIndex = opposites.get(cornerIndex);
+    for(int newCornerIndex: Arrays.asList(3*nextTriangleIndex, 3*nextTriangleIndex + 1, 3*nextTriangleIndex +2) ){
+      if (newCornerIndex != oppIndex){
+        frontier.add(new AbstractMap.SimpleImmutableEntry(nextTriangleIndex, newCornerIndex));
+      }  
+    }
+    
+  }
+  
+  // pop an edge from the frontier 
+  // pivot around this edge
+  // 
+  
+}
+
+int ballPivot(int aCornerIndex, int bCornerIndex, int cCornerIndex, List<Point> P, float r) {
   
   int aIndex = corners.get(aCornerIndex), 
     bIndex = corners.get(bCornerIndex),
     cIndex = corners.get(cCornerIndex);
     
   float bestAngle = Float.MAX_VALUE;
-  Point bestPoint = null;
+  int bestPointIndex = -1;
   
   // AB
+  Point A  = P.get(aIndex);
+  Point B  = P.get(bIndex);
+  Point C  = P.get(cIndex);
+
   for (int dIndex=0; dIndex <P.size(); dIndex++) {
-    Point A  = P.get(aIndex);
-    Point B  = P.get(bIndex);
-    Point C  = P.get(cIndex);
     Point D  = P.get(dIndex);
-    if(A != D && B!=D && C!=D){
+    
+    if(aIndex != dIndex && bIndex != dIndex){ // let c match d - if we pivot to c we dont create the triangle 
       float angle = pivotAngle(A, B, C, D, r);
       
       if (angle < bestAngle) {
         bestAngle = angle;
-        bestPoint = D;
+        bestPointIndex = dIndex;
       }
     }
-    generatedTriangles.add(new Triangle(aIndex, bIndex, dIndex));
     
-    int triangleIndex = generatedTriangles.size();
+  }
+  
+  int triangleIndex = getTriangleIndex(aIndex, bIndex, bestPointIndex); 
+
+  if (bestPointIndex != cIndex){
+    int oppositeIndex = getOpposite(aIndex, bIndex, triangleIndex);
+  
+    opposites.put(cCornerIndex, oppositeIndex);
+    opposites.put(oppositeIndex, cCornerIndex);
+  }
+  return triangleIndex;
+}
+
+int getOpposite(int aIndex, int bIndex, int triangleIndex){
+  int dIndex = corners.get(triangleIndex * 3);  
+  int eIndex = corners.get(triangleIndex * 3 + 1);  
+  int fIndex = corners.get(triangleIndex * 3 + 2);  
+  
+  int sumAB = aIndex + bIndex; 
+  
+  if (dIndex + eIndex == sumAB ){
+    return fIndex;
+  } else if (dIndex + fIndex == sumAB ){
+    return eIndex;
+  } else {
+    return dIndex;
+  }
+  
+}
+
+int getTriangleIndex(int aIndex, int bIndex, int dIndex){
+  Triangle t = new Triangle(aIndex, bIndex, dIndex);
+  if(vertexTriangleMapping.containsKey(t)){
+    return vertexTriangleMapping.get(t);
+  } else {
+    generatedTriangles.add(t);
+    int triangleIndex = generatedTriangles.size() - 1;
+    vertexTriangleMapping.put(t, triangleIndex);
+        
     corners.put(triangleIndex * 3, aIndex);
     corners.put(triangleIndex * 3 + 1, bIndex);
     corners.put(triangleIndex * 3 + 2, dIndex);
-    
-    opposites.put(cCornerIndex, triangleIndex * 3 + 2);
-    opposites.put(triangleIndex * 3 + 2, cCornerIndex);
-
+    return triangleIndex;
   }
-  
-  return bestPoint;
 }
