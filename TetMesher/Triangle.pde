@@ -10,4 +10,12 @@ class Triangle{
     return Objects.hash(aIndex, bIndex, cIndex);
   }
   
+  void drawMe(){
+    beginShape();
+    v(pointCloud.get(aIndex));
+    v(pointCloud.get(bIndex));
+    v(pointCloud.get(cIndex));
+    endShape(CLOSE);
+  }
+  
 }

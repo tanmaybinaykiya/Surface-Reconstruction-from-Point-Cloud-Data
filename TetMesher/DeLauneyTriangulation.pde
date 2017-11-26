@@ -18,6 +18,10 @@ Point circumcircleCenter(Point A, Point B, Point C) {
   return P(M, s, MP);
 }
 
+/**
+  P: circumcenter of triangle A, B, C
+*/
+
 Point circumsphereCenter(Point P, Point A, Point B, Point C, Point D) {
   // The circumcenter of the sphere is given by Q = P + sN, where
   //   P is a circumcenter of triangle ABC

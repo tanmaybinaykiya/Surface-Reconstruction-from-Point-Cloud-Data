@@ -39,6 +39,27 @@ float pivotAngle(Point B, Point C, Point A, Point D, float r) {
   return angle(U, V, W);
 }
 
+void drawBallCenter(Triangle t, float r, color c) {
+  Point A = pointCloud.get(t.aIndex);
+  Point B = pointCloud.get(t.bIndex);
+  Point C = pointCloud.get(t.cIndex);
+  
+  Point centr = centerOfBall(A, B, C, r);
+  
+  fill(c);
+  show(centr, rb);
+  
+  beginShape();
+  v(B);
+  v(A);
+  v(C);
+  endShape(CLOSE);
+  
+  fill(color(red(c), green(c), blue(c), 50));
+  show(centr, r);
+}
+
+
 void drawBallCenter(Point A, Point B, Point C, Point center, float r, color c) {
   if (center == null)
     return;
@@ -72,17 +93,40 @@ Point ballPivot(Point A, Point B, Point C, Points P, float r) {
   return bestPoint;
 }
 
+int getSeedTriangleIndex(List<Point> P, float r){
+  for (int i = 0; i<P.size(); i++){
+    for (int j = i+1; j<P.size(); j++){
+      for (int k = j+1; k<P.size(); k++){
+        Point sphereCenter = centerOfBall(P.get(i), P.get(j), P.get(k), r);
+        if(sphereCenter == null){
+          continue;
+        }
+        boolean isValid = true;
+        for (int l = 0; l<P.size(); l++){
+          if( l== i || l==j || l==k ){
+            continue;
+          }
+          if(d(P.get(l), sphereCenter) < r){
+            isValid = false;
+            break;
+          }
+        }
+        if (isValid){
+          return getTriangleIndex(i, j, k);
+        }
+      }
+    }
+  }
+  throw new RuntimeException("No seed triangle found. Better luck next time.");
+}
 
 void ballPivot(List<Point> P, float r){
-  // pick 3 good points
-  int aIndex = 0 , bIndex = 0 , cIndex = 0; 
-  // create a seed triangle, 
-  int firstTriangleIndex = getTriangleIndex(aIndex, bIndex, cIndex);
+
+  int firstTriangleIndex = getSeedTriangleIndex(P, r);
   
   Stack<Map.Entry<Integer, Integer>> frontier = new Stack();  // triangleIndex and corner to pivot  
   Set<Map.Entry<Integer, Integer>> explored = new HashSet();
-  
-  
+
   frontier.push(new AbstractMap.SimpleImmutableEntry(firstTriangleIndex, 0));
   frontier.push(new AbstractMap.SimpleImmutableEntry(firstTriangleIndex, 1));
   frontier.push(new AbstractMap.SimpleImmutableEntry(firstTriangleIndex, 2));

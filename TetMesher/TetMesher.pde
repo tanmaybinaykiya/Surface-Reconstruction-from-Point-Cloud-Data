@@ -72,12 +72,48 @@ void setup() {
   // Re-render initially
   change = true;
   
-  reTriangulate();
-  resample();
+  //reTriangulate();
+  //resample();
   
 
   
   //sampledMeshes.add(testSamplePointsOnSphere());
+}
+
+void draw(){
+  background(255);
+  hint(ENABLE_DEPTH_TEST); 
+  //pushMatrix();   // to ensure that we can restore the standard view before writing on the canvas
+  setView();  // see pick tab
+  showFloor(h); // draws dance floor as yellow mat
+  doPick(); // sets Of and axes for 3D GUI (see pick Tab)
+  R.SETppToIDofVertexWithClosestScreenProjectionTo(Mouse()); // for picking (does not set P.pv)
+  //hint(DISABLE_DEPTH_TEST);
+  
+  if (showBalls) {
+    fill(orange); 
+    P.drawBalls(rb);
+    fill(green); 
+    Q.drawBalls(rb);  
+    fill(red, 100); 
+    R.showPicked(rb+5);
+  }
+  
+  float r = 600;
+  
+  pointCloud.clear();
+  
+  for (int i =0; i<P.nv; i++){
+    pointCloud.add(P.G.get(i));
+  }
+  for (int i =0; i<Q.nv; i++){
+    pointCloud.add(Q.G.get(i));
+  }
+  
+  int seedTriangleIndex = getSeedTriangleIndex(pointCloud, r);
+  drawBallCenter(generatedTriangles.get(seedTriangleIndex), r, blue);
+  //generatedTriangles.get(seedTriangleIndex).drawMe(); 
+  
 }
 
 void test_draw(){
@@ -90,7 +126,7 @@ void test_draw(){
 
 
 
-void draw() {
+void real_draw() {
   background(255);
   hint(ENABLE_DEPTH_TEST); 
   pushMatrix();   // to ensure that we can restore the standard view before writing on the canvas
