@@ -123,6 +123,7 @@ int getSeedTriangleIndex(List<Point> P, float r){
 void ballPivot(List<Point> P, float r){
 
   int firstTriangleIndex = getSeedTriangleIndex(P, r);
+  println("Seed Triangle::", generatedTriangles.get(firstTriangleIndex));
   
   Stack<Map.Entry<Integer, Integer>> frontier = new Stack();  // triangleIndex and corner to pivot  
   Set<Map.Entry<Integer, Integer>> explored = new HashSet();
@@ -160,7 +161,8 @@ void ballPivot(List<Point> P, float r){
     }
     
     int nextTriangleIndex = ballPivot(aCornerIndex, bCornerIndex, cornerIndex, P, r);
-    
+    println("New Triangle::", generatedTriangles.get(nextTriangleIndex));
+
     if( count == limit){
       drawBallCenter(generatedTriangles.get(nextTriangleIndex), r, blue);
     }
@@ -170,11 +172,12 @@ void ballPivot(List<Point> P, float r){
       println("Pivotted to myself");
       continue;
     }
-    // pick the remaining 2 edges. add them to frontier if not explored already.
+    // pick the remaining 2 edges. add them to frontier
     
     int oppIndex = opposites.get(cornerIndex);
     for(int newCornerIndex: Arrays.asList(3*nextTriangleIndex, 3*nextTriangleIndex + 1, 3*nextTriangleIndex +2) ){
       if (newCornerIndex != oppIndex){
+        println("oppIndex, newCornerIndex: ", oppIndex, newCornerIndex);
         frontier.add(new AbstractMap.SimpleImmutableEntry(nextTriangleIndex, newCornerIndex));
       }  
     }
@@ -237,6 +240,8 @@ int ballPivot(int aCornerIndex, int bCornerIndex, int cCornerIndex, List<Point> 
 }
 
 int getOpposite(int aIndex, int bIndex, int triangleIndex){
+  
+  println("getOpposite: ", aIndex, bIndex, generatedTriangles.get(triangleIndex));
   int dIndex = corners.get(triangleIndex * 3);  
   int eIndex = corners.get(triangleIndex * 3 + 1);  
   int fIndex = corners.get(triangleIndex * 3 + 2);  
@@ -244,11 +249,11 @@ int getOpposite(int aIndex, int bIndex, int triangleIndex){
   int sumAB = aIndex + bIndex; 
   
   if (dIndex + eIndex == sumAB ){
-    return fIndex;
+    return triangleIndex * 3 + 2;
   } else if (dIndex + fIndex == sumAB ){
-    return eIndex;
+    return triangleIndex * 3 + 1;
   } else {
-    return dIndex;
+    return triangleIndex * 3;
   }
   
 }
