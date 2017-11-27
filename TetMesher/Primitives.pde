@@ -32,6 +32,15 @@ void disk(Point P, Vector I, Vector J, float r) {
   endShape();
   }
   
+
+void semiDisk(Point P, Vector I, Vector J, float r, float angleStart, float angleEnd) {
+  float da = (angleEnd - angleStart)/36;
+  beginShape(TRIANGLE_FAN);
+    v(P);
+    for(float a=angleStart; a<=angleEnd+da; a+=da) v(P(P,r*cos(a),I,r*sin(a),J));
+  endShape();
+  }
+  
 void disk(Point P, Vector V, float r) {  
   Vector I = U(Normal(V));
   Vector J = U(N(I,V));
@@ -152,8 +161,8 @@ void showFloor(float h)
               translate(-d*n/2,0,0);
               for(int i=0; i<n; i++)
                 {
-                fill(cyan); box(d,d,1);  pushMatrix(); translate(d,d,0);  box(d,d,1); popMatrix();
-                fill(pink); pushMatrix(); translate(d,0,0); box(d,d,1); translate(-d,d,0); box(d,d,1); popMatrix();
+                fill(white); box(d,d,1);  pushMatrix(); translate(d,d,0);  box(d,d,1); popMatrix();
+                fill(grey); pushMatrix(); translate(d,0,0); box(d,d,1); translate(-d,d,0); box(d,d,1); popMatrix();
                 translate(2*d,0,0);
                 }
             popMatrix();
