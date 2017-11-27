@@ -11,8 +11,8 @@ public class Edge {
   
   public Edge(int vertex1, int vertex2) {
     // Canonical representation of edge is sorted IDs.
-    this.first = min(vertex1, vertex2);
-    this.second = max(vertex1, vertex2);
+    this.first = vertex1;
+    this.second = vertex2;
   }
   
   public Point getFirstPoint(Points floor, Points ceil) {
@@ -23,12 +23,22 @@ public class Edge {
     return (this.second > 0) ? floor.G.get(this.second - 1) : ceil.G.get(-1*this.second - 1);
   }
   
-  public boolean equals(Edge other) {
-    return this.first == other.first && this.second == other.second;
+  public boolean equals(Object other) {
+    if (other instanceof Edge) {
+      Edge o = (Edge)other;
+      return (this.first == o.first && this.second == o.second) || (this.first == o.second && this.second == o.first);
+    }
+    else {
+      return false;
+    }
   }
   
   public int hashCode() {
-    return Objects.hash(this.first, this.second);
+    return Objects.hash(min(this.first, this.second), max(this.first, this.second));
+  }
+  
+  public String toString() {
+    return "(" + first + " , " + second + ")";
   }
 }
 Edge edgeFloorFloor(int v1, int v2) { return new Edge(v1 + 1, v2 + 1); }

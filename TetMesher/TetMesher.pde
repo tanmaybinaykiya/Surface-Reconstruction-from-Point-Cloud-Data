@@ -41,9 +41,9 @@ List<EquilateralMesh> sampledMeshes;
 List<Point> pointCloud;
 
 List<Triangle> generatedTriangles ;
-Map<Integer, Integer> corners;   // cornerId to vertexId ; corner /3 == triangleId 
-Map<Integer, Integer> opposites;  // corner id to corner id 
-Map<Triangle, Integer> vertexTriangleMapping; // vertex triplet to triangle mapping
+Map<Edge, Integer> frontier;
+Set<Edge> explored;
+Set<Edge> boundaryEdges;
 
 void setup() {
   
@@ -85,9 +85,9 @@ void resetAll(){
   //sampledMeshes = new ArrayList();
   pointCloud = new ArrayList();
   generatedTriangles = new ArrayList();
-  corners = new HashMap();
-  opposites = new HashMap();
-  vertexTriangleMapping = new HashMap();
+  frontier = new HashMap();
+  explored = new HashSet();
+  boundaryEdges = new HashSet();
 }
 
 void draw(){  
@@ -96,7 +96,7 @@ void draw(){
   //pushMatrix();   // to ensure that we can restore the standard view before writing on the canvas
   setView();  // see pick tab
   showFloor(h); // draws dance floor as yellow mat
-  doPick(); // sets Of and axes for 3D GUI (see pick Tab)
+  //doPick(); // sets Of and axes for 3D GUI (see pick Tab)
   R.SETppToIDofVertexWithClosestScreenProjectionTo(Mouse()); // for picking (does not set P.pv)
   //hint(DISABLE_DEPTH_TEST);
   
@@ -108,31 +108,9 @@ void draw(){
     fill(red, 100); 
     R.showPicked(rb+5);
   }
-    
-  float r = 750;
-  //int seedTriangleIndex = getSeedTriangleIndex(pointCloud, r);
-  //Triangle seedTriangle = generatedTriangles.get(seedTriangleIndex);
-  ////println("Seed index:", seedTriangleIndex, "Seed:", seedTriangle);
-  
-  ////drawBallCenter(seedTriangle, r, blue);
-  
-  //fill(blue, 50);
-  //show(pointCloud.get(seedTriangle.aIndex), 30);
-  //fill(green, 50);show(pointCloud.get(seedTriangle.bIndex), 30);
-  //fill(red, 50);show(pointCloud.get(seedTriangle.cIndex), 30);
-  
-  
-  //fill(red);
-  //seedTriangle.drawMe(); 
-
-  
-  //fill(white);
-  //stroke(black);
-  //strokeWeight(1);
-  //for (EquilateralMesh mesh : sampledMeshes)
-  //mesh.draw();
   
   resetAll();
+  
   for (int i =0; i<P.nv; i++){
     pointCloud.add(P.G.get(i));
   }
@@ -140,15 +118,34 @@ void draw(){
     pointCloud.add(Q.G.get(i));
   }
   
-  println("Points:", pointCloud.size());
-  ballPivot(pointCloud, r);
-  strokeWeight(2);
+  float r = 1000;
+  ballPivot(pointCloud, r, limit);
+  
+  strokeWeight(1);
   stroke(black);
   fill(pink, 150);
   for (Triangle t: generatedTriangles){
     t.drawMe();
   }
   
+  for (Edge e : explored) {
+    fill(red);
+    strokeWeight(0);
+    beam(pointCloud.get(e.first), pointCloud.get(e.second), 10);
+  }
+  
+  boolean first = true;
+  for (Edge e : frontier.keySet()) {
+    if (first) {
+      fill(yellow);
+      first = false;
+    }
+    else {
+      fill(green);
+    }
+    strokeWeight(0);
+    beam(pointCloud.get(e.first), pointCloud.get(e.second), 10);
+  }
 }
 
 void test_draw(){
@@ -163,7 +160,7 @@ void test_draw(){
 
 void real_draw() {
   background(255);
-  hint(ENABLE_DEPTH_TEST); 
+  //hint(ENABLE_DEPTH_TEST); 
   pushMatrix();   // to ensure that we can restore the standard view before writing on the canvas
   setView();  // see pick tab
   showFloor(h); // draws dance floor as yellow mat
@@ -195,14 +192,14 @@ void real_draw() {
   //drawBallCenter(A, B, C, centerABC, r, blue);
   //drawBallCenter(C, B, D, centerCBD, r, orange);
   
-  Point D1 = ballPivot(A, B, C, P, r);
-  Point D2 = ballPivot(B, C, A, P, r);
-  Point D3 = ballPivot(C, A, B, P, r);
+  //Point D1 = ballPivot(A, B, C, P, r);
+  //Point D2 = ballPivot(B, C, A, P, r);
+  //Point D3 = ballPivot(C, A, B, P, r);
   
-  drawBallCenter(A, B, C, centerOfBall(A, B, C, r), r, blue);
-  drawBallCenter(B, A, D1, centerOfBall(B, A, D1, r), r, red);
-  drawBallCenter(C, B, D2, centerOfBall(C, B, D2, r), r, green);
-  drawBallCenter(A, C, D3, centerOfBall(A, C, D3, r), r, orange);
+  //drawBallCenter(A, B, C, centerOfBall(A, B, C, r), r, blue);
+  //drawBallCenter(B, A, D1, centerOfBall(B, A, D1, r), r, red);
+  //drawBallCenter(C, B, D2, centerOfBall(C, B, D2, r), r, green);
+  //drawBallCenter(A, C, D3, centerOfBall(A, C, D3, r), r, orange);
 
   /*********************************
    * Part 1: Triangulate the mesh
