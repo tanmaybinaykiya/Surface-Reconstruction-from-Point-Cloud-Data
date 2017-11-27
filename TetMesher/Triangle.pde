@@ -1,9 +1,9 @@
 class Triangle{
   int aIndex, bIndex, cIndex;
   Triangle(int aIndex, int bIndex, int cIndex){
-    this.aIndex = min(aIndex, bIndex, cIndex);
-    this.cIndex = max(aIndex, bIndex, cIndex);
-    this.bIndex = aIndex + bIndex + cIndex - this.aIndex - this.cIndex;
+    this.aIndex = aIndex;
+    this.cIndex = bIndex;
+    this.bIndex = cIndex;
   }
   
   int hashCode(){
@@ -16,17 +16,26 @@ class Triangle{
     //println("Equals method callsed");
     if(other instanceof Triangle){
       Triangle othern = (Triangle) other;
-      return this.aIndex == othern.aIndex && this.bIndex == othern.bIndex && this.cIndex == othern.cIndex;
+      
+      int minIndex = min(this.aIndex, this.bIndex, this.cIndex);
+      int maxIndex = max(this.aIndex, this.bIndex, this.cIndex);
+      int midIndex = this.aIndex + this.bIndex + this.cIndex - minIndex - maxIndex;
+      
+      int otherMinIndex = min(othern.aIndex, othern.bIndex, othern.cIndex);
+      int otherMaxIndex = max(othern.aIndex, othern.bIndex, othern.cIndex);
+      int otherMidIndex = othern.aIndex + othern.bIndex + othern.cIndex - minIndex - maxIndex;
+      
+      return minIndex == otherMinIndex && maxIndex == otherMaxIndex && midIndex == otherMidIndex;
     } else {
       return false;
     }
   }
   
-  void drawMe(){
+  void drawMe(boolean smooth){
     beginShape();
-    v(pointCloud.get(aIndex));
-    v(pointCloud.get(bIndex));
-    v(pointCloud.get(cIndex));
+    if (smooth) { normal(pointNormals[aIndex]); } v(pointCloud.get(aIndex));
+    if (smooth) { normal(pointNormals[bIndex]); } v(pointCloud.get(bIndex));
+    if (smooth) { normal(pointNormals[cIndex]); } v(pointCloud.get(cIndex));
     endShape(CLOSE);
   }
   

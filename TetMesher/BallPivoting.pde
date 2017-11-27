@@ -136,6 +136,15 @@ void ballPivot(VoxelSpace voxelSpace, float r, boolean flipOrientation, int limi
     explored.add(pivotEdge);
     count++;
     
+    // Add the normal component
+    Point P1 = voxelSpace.points.get(pivotEdge.first);
+    Point P2 = voxelSpace.points.get(pivotEdge.second);
+    Point PP = voxelSpace.points.get(pivotVertex);
+    
+    pointNormals[pivotEdge.first].add(N(V(P1, PP), V(P1, P2)));
+    pointNormals[pivotVertex].add(N(V(PP, P2), V(PP, P1)));
+    pointNormals[pivotEdge.second].add(N(V(P2, P1), V(P2, PP)));
+    
     //drawNormal(P, pivotEdge, pivotVertex, r);
     int nextVertex = ballPivot(pivotEdge, pivotVertex, voxelSpace, r);    
     
@@ -175,14 +184,14 @@ void ballPivot(VoxelSpace voxelSpace, float r, boolean flipOrientation, int limi
     
     if (!exploredEdgeFirst && !exploredEdgeSecond) {
       // Neither edge was found, so this is a new triangle
-      generatedTriangles.add(new Triangle(pivotEdge.first, pivotEdge.second, nextVertex));
+      generatedTriangles.add(new Triangle(pivotEdge.first, nextVertex, pivotEdge.second));
       
-      // Peek at the ball that will pivot around the next triangle
-      Edge nextPivotEdge = frontier.peek();
-      int nextPivotVertex = pivotEdges.get(nextPivotEdge);
-      
-      if (count == limit)
+      if (count == limit) {
+        // Peek at the ball that will pivot around the next triangle
+        Edge nextPivotEdge = frontier.peek();
+        int nextPivotVertex = pivotEdges.get(nextPivotEdge);
         drawBallCenter(nextPivotEdge, nextPivotVertex, voxelSpace.points, r, blue);
+      }
     }
   }
   

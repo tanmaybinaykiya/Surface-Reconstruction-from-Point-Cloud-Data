@@ -34,8 +34,10 @@ void keyPressed()
   if(key=='2') b2 = !b2;
   if(key=='3') b3 = !b3;
   if(key=='4') b4 = !b4;
+  if(key=='5') b5 = !b5;
   
-  if (key != ' ') {
+  // Don't need to change when key is space or 5 (smooth shading)
+  if (key != ' ' && key != '5') {
     change=true;   // to save a frame for the movie when user pressed a key 
   }
   }
@@ -107,4 +109,4 @@ void displayFooter()  // Displays help text at the bottom
 String title ="Lattice Maker", name ="TEAM NAMES",
        menu="?:help, t/T:move view, space:rotate view, `/wheel:zoom, !:picture, ~:(start/stop) filming,  #:quit",
        guide="click&drag:pick&slide, f:flip ceiling/floor, x/X:move picked/all, p/P:perturb, X:slide All, |:snap heights, l/L:load, w/W:write", // user's guide
-       extra="1:show 1-3 tets, 2:show 2-2 tets, 3:show 3-1 tets, 4:fill small tets";
+       extra="1:show 1-3 tets, 2:show 2-2 tets, 3:show 3-1 tets, 4:fill small tets, 5:toggle smooth shading";

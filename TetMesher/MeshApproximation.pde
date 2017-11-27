@@ -12,7 +12,7 @@ EquilateralMesh samplePointsOnBeam(Edge edge, Points floor, Points ceil, float r
   
   // Compute the parameters for going around and along the beam
   float angleTotal = 2*PI;
-  float angleStepNum = 8;
+  float angleStepNum = 12;
   float angleStepEach = angleTotal / angleStepNum;
   
   float lengthTotal = d(P, Q);

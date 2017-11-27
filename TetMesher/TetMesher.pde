@@ -22,6 +22,7 @@ Boolean
   b2 = true, 
   b3 = true, 
   b4 = true,
+  b5 = true,
   flipOrientation = false;
 float 
   h_floor=0, h_ceiling=600, h=h_floor, 
@@ -40,6 +41,7 @@ Points R, S;
 Set<Edge> edges;
 List<EquilateralMesh> sampledMeshes;
 List<Point> pointCloud;
+Vector[] pointNormals;
 
 List<Triangle> generatedTriangles ;
 Map<Edge, Integer> pivotEdges;
@@ -134,6 +136,11 @@ void draw(){
     reTriangulate();
     resample();
     
+    pointNormals = new Vector[pointCloud.size()];
+    for (int i = 0; i < pointNormals.length; i++) {
+      pointNormals[i] = V(0, 0, 0);
+    }
+    
     float r = 20;
     VoxelSpace voxelSpace = new VoxelSpace(pointCloud, r * 2);
     //println("Voxels:", voxelSpace.voxels.size());
@@ -142,12 +149,12 @@ void draw(){
     ballPivot(voxelSpace, r, flipOrientation, limit);
   }
   
-  strokeWeight(1);
-  stroke(black);
-  fill(pink, 200);
+  //strokeWeight(1);
+  //stroke(black);
+  fill(pink);
   //println("Triangles:", generatedTriangles.size());
   for (Triangle t: generatedTriangles){
-    t.drawMe();
+    t.drawMe(b5); // b5 == smoothShading?
     //Point A = pointCloud.get(t.aIndex);
     //Point B = pointCloud.get(t.bIndex);
     //Point C = pointCloud.get(t.cIndex);
