@@ -12,7 +12,7 @@ EquilateralMesh samplePointsOnBeam(Edge edge, Points floor, Points ceil, float r
   
   // Compute the parameters for going around and along the beam
   float angleTotal = 2*PI;
-  float angleStepNum = 6;
+  float angleStepNum = 10;
   float angleStepEach = angleTotal / angleStepNum;
   
   float lengthTotal = d(P, Q);
@@ -28,7 +28,7 @@ EquilateralMesh samplePointsOnBeam(Edge edge, Points floor, Points ceil, float r
     float alphaOffset = d * angleStepEach / 2;
     
     // Enumerate around the beam
-    for (int a = 0; a < angleStepNum + 1; a++) {
+    for (int a = 0; a < angleStepNum; a++) {
       float alphaStart = alphaOffset + a*angleStepEach;
       
       Point O = P(P, d * lengthStepEach, T);
@@ -44,7 +44,7 @@ EquilateralMesh samplePointsOnBeam(Edge edge, Points floor, Points ceil, float r
 
 EquilateralMesh samplePointsOnSphere(Point P, float radius) {
   
-  float someConst = 5;
+  float someConst = 20;
   
   println("samplePointsOnSphere: r", radius, P);
   // TODO: Implement so that you get nicely spaced equilateral triangles around the sphere
@@ -52,14 +52,14 @@ EquilateralMesh samplePointsOnSphere(Point P, float radius) {
   Vector i = V(1, 0, 0);
   Vector j = V(0, 1, 0);
   Vector k = V(0, 0, 1);
-  for (float r = -radius; r <= radius; r += 8){
+  for (float r = -radius + 2; r < radius; r += 8){
     float thisRadius = sqrt(radius*radius - r*r);
     float dTheta = PI/someConst; // L / (thisRadius * 3);
 
     List<Point> layer = new ArrayList();     
     println("move along z axis:", r, P, k, P(P, r, k));
 
-    for (float angle = 0; angle < 2*PI + PI/(someConst+1); angle += dTheta){
+    for (float angle = 0; angle < 2*PI; angle += dTheta){
       
       
       Point X = P(P(P(P, r, k), thisRadius * cos(angle), i), thisRadius * sin(angle), j);
