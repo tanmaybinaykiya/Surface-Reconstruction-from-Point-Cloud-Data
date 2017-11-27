@@ -27,14 +27,16 @@ void keyPressed()
   if(key=='|') {P.setZ(h_floor); Q.setZ(h_ceiling);} // project all sites on their respective plane
   if(key=='#') exit();
   
+  if (key=='o') { F = R.G.get(R.pv); }
+  
   if(key=='1') b1 = !b1;
   if(key=='2') b2 = !b2;
   if(key=='3') b3 = !b3;
   if(key=='4') b4 = !b4;
   
-  if (key != ' ') {
-    change=true;   // to save a frame for the movie when user pressed a key 
-  }
+  //if (key != ' ') {
+  //  change=true;   // to save a frame for the movie when user pressed a key 
+  //}
   }
 
 void mouseWheel(MouseEvent event) 
@@ -53,7 +55,7 @@ void mousePressed()
 //  if(keyPressed && (key=='f' || key=='s' || key=='b' || key=='c')) {P.addPt(Of,key);}
 
  // if (!keyPressed) P.setPicked();
-  change=true;
+  //change=true;
   }
   
 void mouseMoved() 
@@ -85,7 +87,7 @@ void mouseDragged()
     if(center) F.sub(ToK(V((float)(mouseX-pmouseX),(float)(mouseY-pmouseY),0))); 
     else F.add(ToK(V((float)(mouseX-pmouseX),(float)(mouseY-pmouseY),0))); 
     }
-  change=true;
+  //change=true;
   }  
 
 // **** Header, footer, help text on canvas

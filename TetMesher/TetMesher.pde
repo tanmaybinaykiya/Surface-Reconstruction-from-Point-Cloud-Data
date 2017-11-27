@@ -5,7 +5,7 @@ Boolean
   center=true, 
   track=false, 
   showViewer=false, 
-  showBalls=true, 
+  showBalls=false, 
   showControl=true, 
   showCurve=true, 
   showPath=true, 
@@ -26,7 +26,7 @@ float
   h_floor=0, h_ceiling=600, h=h_floor, 
   t=0, 
   s=0, 
-  rb=30, rt=rb/2; // radius of the balls and tubes
+  rb=30, rt=rb; // radius of the balls and tubes
 
 int
   f=0, maxf=2*30, level=4, method=5, limit=0;
@@ -109,12 +109,12 @@ void draw(){
     R.showPicked(rb+5);
   }
     
-  //for (Point p : pointCloud) {
-  //  noFill();
-  //  strokeWeight(1);
-  //  stroke(grey);
-  //  show(p, 1);
-  //}
+  for (Point p : pointCloud) {
+    fill(blue, 100);
+    strokeWeight(1);
+    stroke(grey);
+    show(p, 0.5);
+  }
   
   //for (int i =0; i<P.nv; i++){
   //  pointCloud.add(P.G.get(i));
@@ -123,17 +123,17 @@ void draw(){
   //  pointCloud.add(Q.G.get(i));
   //}
   
-  if (change) {
+  //if (change) {
     resetAll();
     float r = 15;
-    limit = Integer.MAX_VALUE;
+    //limit = Integer.MAX_VALUE;
     ballPivot(pointCloud, r, limit);
-  }
+  //}
   
   strokeWeight(1);
   stroke(black);
-  fill(pink, 150);
-  println("Triangles:", generatedTriangles.size());
+  fill(orange, 255);
+  //println("Triangles:", generatedTriangles.size());
   for (Triangle t: generatedTriangles){
     t.drawMe();
     //Point A = pointCloud.get(t.aIndex);
@@ -305,18 +305,19 @@ void resample(){
   for (int i =0; i<P.nv; i++) {
     Point S = P.G.get(i);
     sampledMeshes.add(samplePointsOnSphere(S, rb));
+    break;
   }
   
-  //Ceiling
-  for (int i =0; i<Q.nv; i++) {
-    Point S = Q.G.get(i);
-    sampledMeshes.add(samplePointsOnSphere(S, rb));
-  }
+  ////Ceiling
+  //for (int i =0; i<Q.nv; i++) {
+  //  Point S = Q.G.get(i);
+  //  sampledMeshes.add(samplePointsOnSphere(S, rb));
+  //}
 
   // Beams
-  for (Edge edge : edges) {
-    sampledMeshes.add(samplePointsOnBeam(edge, P, Q, rt));
-  }
+  //for (Edge edge : edges) {
+  //  sampledMeshes.add(samplePointsOnBeam(edge, P, Q, rt));
+  //}
   
   pointCloud.clear();
   

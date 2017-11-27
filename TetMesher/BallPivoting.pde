@@ -201,7 +201,7 @@ float pivotAngle(Point B, Point C, Point A, Point D, float r) {
   if (centerABC == null || centerCBD == null) 
     return Float.MAX_VALUE;
   
-  Point mBC = P(B, C);
+  Point mBC = P(B,C);
   
   Vector U = V(mBC, centerABC);
   Vector V = V(mBC, centerCBD);

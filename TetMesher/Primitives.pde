@@ -152,8 +152,8 @@ void showFloor(float h)
               translate(-d*n/2,0,0);
               for(int i=0; i<n; i++)
                 {
-                fill(cyan); box(d,d,1);  pushMatrix(); translate(d,d,0);  box(d,d,1); popMatrix();
-                fill(pink); pushMatrix(); translate(d,0,0); box(d,d,1); translate(-d,d,0); box(d,d,1); popMatrix();
+                fill(white); box(d,d,1);  pushMatrix(); translate(d,d,0);  box(d,d,1); popMatrix();
+                fill(grey); pushMatrix(); translate(d,0,0); box(d,d,1); translate(-d,d,0); box(d,d,1); popMatrix();
                 translate(2*d,0,0);
                 }
             popMatrix();
