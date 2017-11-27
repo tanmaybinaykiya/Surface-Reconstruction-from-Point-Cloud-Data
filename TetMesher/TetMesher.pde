@@ -70,8 +70,8 @@ void setup() {
   // Re-render initially
   change = true;
   
-  //reTriangulate();
-  //resample();
+  reTriangulate();
+  resample();
   
   
     
@@ -83,7 +83,7 @@ void setup() {
 void resetAll(){
   //edges = new HashSet();
   //sampledMeshes = new ArrayList();
-  pointCloud = new ArrayList();
+  //pointCloud = new ArrayList();
   generatedTriangles = new ArrayList();
   frontier = new HashMap();
   explored = new HashSet();
@@ -111,41 +111,54 @@ void draw(){
   
   resetAll();
   
-  for (int i =0; i<P.nv; i++){
-    pointCloud.add(P.G.get(i));
-  }
-  for (int i =0; i<Q.nv; i++){
-    pointCloud.add(Q.G.get(i));
-  }
+  //for (Point p : pointCloud) {
+  //  noFill();
+  //  strokeWeight(1);
+  //  stroke(grey);
+  //  show(p, 1);
+  //}
   
-  float r = 1000;
+  //for (int i =0; i<P.nv; i++){
+  //  pointCloud.add(P.G.get(i));
+  //}
+  //for (int i =0; i<Q.nv; i++){
+  //  pointCloud.add(Q.G.get(i));
+  //}
+  
+  float r = 100;
+  limit = Integer.MAX_VALUE;
   ballPivot(pointCloud, r, limit);
   
   strokeWeight(1);
   stroke(black);
   fill(pink, 150);
+  //println("Triangles:", generatedTriangles);
   for (Triangle t: generatedTriangles){
     t.drawMe();
+    //strokeWeight(0);
+    //fill(red, 100); show(pointCloud.get(t.aIndex), 1);
+    //fill(green, 100); show(pointCloud.get(t.bIndex), 1);
+    //fill(blue, 100); show(pointCloud.get(t.cIndex), 1);
   }
   
-  for (Edge e : explored) {
-    fill(red);
-    strokeWeight(0);
-    beam(pointCloud.get(e.first), pointCloud.get(e.second), 10);
-  }
+  //for (Edge e : explored) {
+  //  fill(red);
+  //  strokeWeight(0);
+  //  beam(pointCloud.get(e.first), pointCloud.get(e.second), 0.5);
+  //}
   
-  boolean first = true;
-  for (Edge e : frontier.keySet()) {
-    if (first) {
-      fill(yellow);
-      first = false;
-    }
-    else {
-      fill(green);
-    }
-    strokeWeight(0);
-    beam(pointCloud.get(e.first), pointCloud.get(e.second), 10);
-  }
+  //boolean first = true;
+  //for (Edge e : frontier.keySet()) {
+  //  if (first) {
+  //    fill(yellow);
+  //    first = false;
+  //  }
+  //  else {
+  //    fill(green);
+  //  }
+  //  strokeWeight(0);
+  //  beam(pointCloud.get(e.first), pointCloud.get(e.second), 0.5);
+  //}
 }
 
 void test_draw(){
@@ -178,7 +191,7 @@ void real_draw() {
     R.showPicked(rb+5);
   }
   
-  float r = 600;
+  float r = 100;
   Point A = Q.G.get(0), B = Q.G.get(1), C = Q.G.get(2);
   //Point D1 = P.G.get(0), D2 = P.G.get(1);
   

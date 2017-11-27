@@ -12,7 +12,7 @@ EquilateralMesh samplePointsOnBeam(Edge edge, Points floor, Points ceil, float r
   
   // Compute the parameters for going around and along the beam
   float angleTotal = 2*PI;
-  float angleStepNum = 6;
+  float angleStepNum = 4;
   float angleStepEach = angleTotal / angleStepNum;
   
   float lengthTotal = d(P, Q);
@@ -28,7 +28,7 @@ EquilateralMesh samplePointsOnBeam(Edge edge, Points floor, Points ceil, float r
     float alphaOffset = d * angleStepEach / 2;
     
     // Enumerate around the beam
-    for (int a = 0; a < angleStepNum + 1; a++) {
+    for (int a = 0; a < angleStepNum; a++) {
       float alphaStart = alphaOffset + a*angleStepEach;
       
       Point O = P(P, d * lengthStepEach, T);
@@ -59,7 +59,7 @@ EquilateralMesh samplePointsOnSphere(Point P, float radius) {
     List<Point> layer = new ArrayList();     
     println("move along z axis:", r, P, k, P(P, r, k));
 
-    for (float angle = 0; angle < 2*PI + PI/(someConst+1); angle += dTheta){
+    for (float angle = 0; angle < 2*PI; angle += dTheta){
       
       
       Point X = P(P(P(P, r, k), thisRadius * cos(angle), i), thisRadius * sin(angle), j);

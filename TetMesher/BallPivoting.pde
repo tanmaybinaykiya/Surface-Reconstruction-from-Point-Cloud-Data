@@ -51,7 +51,7 @@ void drawBallCenter(int c, int a, int b, float r, color col) {
   Point centr = centerOfBall(C, A, B, r);
   
   fill(col);
-  show(centr, rb);
+  show(centr, rb/10);
   
   //beginShape();
   //v(B);
@@ -106,7 +106,7 @@ void addSeedEdges(List<Point> P, float r){
 
 void ballPivot(List<Point> P, float r, int limit){
   addSeedEdges(P, r);
-  //println("Added seed edges: ", frontier);
+  println("Added seed edges: ", frontier);
   
   int count = 0;
   
@@ -128,9 +128,9 @@ void ballPivot(List<Point> P, float r, int limit){
     
     int nextVertex = ballPivot(pivotEdge.first, pivotEdge.second, pivotVertex, P, r);    
     
-    if (count == limit) {
-      drawBallCenter(pivotVertex, pivotEdge.first, pivotEdge.second, r, blue);
-    }
+    //if (count == limit) {
+    //  drawBallCenter(pivotVertex, pivotEdge.first, pivotEdge.second, r, blue);
+    //}
     
     if (nextVertex < 0) {
       println("Could not find vertex;", pivotEdge, "is boundary");
