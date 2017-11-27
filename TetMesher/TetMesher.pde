@@ -108,9 +108,7 @@ void draw(){
     fill(red, 100); 
     R.showPicked(rb+5);
   }
-  
-  resetAll();
-  
+    
   //for (Point p : pointCloud) {
   //  noFill();
   //  strokeWeight(1);
@@ -125,20 +123,27 @@ void draw(){
   //  pointCloud.add(Q.G.get(i));
   //}
   
-  float r = 100;
-  limit = Integer.MAX_VALUE;
-  ballPivot(pointCloud, r, limit);
+  if (change) {
+    resetAll();
+    float r = 15;
+    limit = Integer.MAX_VALUE;
+    ballPivot(pointCloud, r, limit);
+  }
   
   strokeWeight(1);
   stroke(black);
   fill(pink, 150);
-  //println("Triangles:", generatedTriangles);
+  println("Triangles:", generatedTriangles.size());
   for (Triangle t: generatedTriangles){
     t.drawMe();
-    //strokeWeight(0);
-    //fill(red, 100); show(pointCloud.get(t.aIndex), 1);
-    //fill(green, 100); show(pointCloud.get(t.bIndex), 1);
-    //fill(blue, 100); show(pointCloud.get(t.cIndex), 1);
+    //Point A = pointCloud.get(t.aIndex);
+    //Point B = pointCloud.get(t.bIndex);
+    //Point C = pointCloud.get(t.cIndex);
+    //println("A:", A, "B:", B, "C:", C);
+    
+    //fill(red, 100); show(A, 1);
+    //fill(green, 100); show(B, 1);
+    //fill(blue, 100); show(C, 1);
   }
   
   //for (Edge e : explored) {
@@ -159,6 +164,8 @@ void draw(){
   //  strokeWeight(0);
   //  beam(pointCloud.get(e.first), pointCloud.get(e.second), 0.5);
   //}
+  
+  change = false;
 }
 
 void test_draw(){
@@ -294,17 +301,17 @@ void reTriangulate(){
 void resample(){
   sampledMeshes.clear();
 
-  ////Floor
-  //for (int i =0; i<P.nv; i++) {
-  //  Point S = P.G.get(i);
-  //  sampledMeshes.add(samplePointsOnSphere(S, rb));
-  //}
+  //Floor
+  for (int i =0; i<P.nv; i++) {
+    Point S = P.G.get(i);
+    sampledMeshes.add(samplePointsOnSphere(S, rb));
+  }
   
-  ////Ceiling
-  //for (int i =0; i<Q.nv; i++) {
-  //  Point S = Q.G.get(i);
-  //  sampledMeshes.add(samplePointsOnSphere(S, rb));
-  //}
+  //Ceiling
+  for (int i =0; i<Q.nv; i++) {
+    Point S = Q.G.get(i);
+    sampledMeshes.add(samplePointsOnSphere(S, rb));
+  }
 
   // Beams
   for (Edge edge : edges) {

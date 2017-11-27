@@ -31,7 +31,10 @@ void keyPressed()
   if(key=='2') b2 = !b2;
   if(key=='3') b3 = !b3;
   if(key=='4') b4 = !b4;
-  change=true;   // to save a frame for the movie when user pressed a key 
+  
+  if (key != ' ') {
+    change=true;   // to save a frame for the movie when user pressed a key 
+  }
   }
 
 void mouseWheel(MouseEvent event) 
