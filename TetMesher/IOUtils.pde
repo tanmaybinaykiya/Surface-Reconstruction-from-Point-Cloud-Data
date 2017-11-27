@@ -12,6 +12,7 @@ void keyPressed()
   if(key=='-') {limit-- ; if (limit<0) limit =0;}
 
   if(key=='f') {flipped=!flipped; if(flipped) {R=Q; S=P; h=h_ceiling;} else {R=P; S=Q; h=h_floor;}}
+  if(key=='F') { flipOrientation = !flipOrientation; }
   //if(key=='3') {R.resetOnCircle(3,300); }
   //if(key=='4') {R.resetOnCircle(4,400); }
   //if(key=='5') {R.resetOnCircle(5,500); }
@@ -34,9 +35,9 @@ void keyPressed()
   if(key=='3') b3 = !b3;
   if(key=='4') b4 = !b4;
   
-  //if (key != ' ') {
-  //  change=true;   // to save a frame for the movie when user pressed a key 
-  //}
+  if (key != ' ') {
+    change=true;   // to save a frame for the movie when user pressed a key 
+  }
   }
 
 void mouseWheel(MouseEvent event) 
@@ -55,7 +56,7 @@ void mousePressed()
 //  if(keyPressed && (key=='f' || key=='s' || key=='b' || key=='c')) {P.addPt(Of,key);}
 
  // if (!keyPressed) P.setPicked();
-  //change=true;
+  change=true;
   }
   
 void mouseMoved() 
@@ -87,7 +88,7 @@ void mouseDragged()
     if(center) F.sub(ToK(V((float)(mouseX-pmouseX),(float)(mouseY-pmouseY),0))); 
     else F.add(ToK(V((float)(mouseX-pmouseX),(float)(mouseY-pmouseY),0))); 
     }
-  //change=true;
+  change=true;
   }  
 
 // **** Header, footer, help text on canvas

@@ -61,13 +61,16 @@ void drawNormal(List<Point> P, Edge e, int vertex, float r) {
   //VS x SF
 }
 
-void addSeedEdges(List<Point> P, float r){
-  for (int i = 50; i<P.size(); i++){
-    for (int j = i+1; j<P.size(); j++){
-      for (int k = j+1; k<P.size(); k++){
-        Point I = P.get(i);
-        Point J = P.get(j);
-        Point K = P.get(k);
+void addSeedEdges(VoxelSpace voxelSpace, float r, boolean flipOrientation){
+  for (int i = 0; i<voxelSpace.points.size(); i++){
+    for (int j : voxelSpace.getNeighboringPoints(i)) {
+      for (int k : voxelSpace.getNeighboringPoints(j)) {
+        if (i == j || i == k || j == k)
+          continue;
+          
+        Point I = voxelSpace.points.get(i);
+        Point J = voxelSpace.points.get(j);
+        Point K = voxelSpace.points.get(k);
         Point sphereCenter = centerOfBall(J, I, K, r);
         
         if(sphereCenter == null){
@@ -76,20 +79,30 @@ void addSeedEdges(List<Point> P, float r){
         
         boolean isValid = true;
         
-        for (int l = 0; l<P.size(); l++){
+        for (int l : voxelSpace.getNeighboringPoints(k)){
           if( l== i || l==j || l==k ){
             continue;
           }
-          if(d(P.get(l), sphereCenter) < r){
+          
+          if(d(voxelSpace.points.get(l), sphereCenter) < r){
             isValid = false;
             break;
           }
         }
         
         if (isValid){
-          Edge e1 = new Edge(j, i),
-               e2 = new Edge(k, j),
-               e3 = new Edge(i, k);
+          Edge e1, e2, e3;
+          
+          if (flipOrientation) {
+            e1 = new Edge(j, i);
+            e2 = new Edge(k, j);
+            e3 = new Edge(i, k);
+          }
+          else {
+            e1 = new Edge(i, j);
+            e2 = new Edge(j, k);
+            e3 = new Edge(k, i);
+          }            
                
           pivotEdges.put(e1, k);
           pivotEdges.put(e2, i);
@@ -106,9 +119,9 @@ void addSeedEdges(List<Point> P, float r){
   throw new RuntimeException("No seed triangle found. Better luck next time.");
 }
 
-void ballPivot(List<Point> P, float r, int limit){
-  addSeedEdges(P, r);
-  //println("Added seed edges: ", frontier);
+void ballPivot(VoxelSpace voxelSpace, float r, boolean flipOrientation, int limit){
+  addSeedEdges(voxelSpace, r, flipOrientation);
+  println("Added seed edges: ", frontier);
   
   int count = 0;
   
@@ -124,7 +137,7 @@ void ballPivot(List<Point> P, float r, int limit){
     count++;
     
     //drawNormal(P, pivotEdge, pivotVertex, r);
-    int nextVertex = ballPivot(pivotEdge, pivotVertex, P, r);    
+    int nextVertex = ballPivot(pivotEdge, pivotVertex, voxelSpace, r);    
     
     //if (count == limit) {
     //  drawBallCenter(pivotVertex, pivotEdge.first, pivotEdge.second, r, blue);
@@ -169,24 +182,24 @@ void ballPivot(List<Point> P, float r, int limit){
       int nextPivotVertex = pivotEdges.get(nextPivotEdge);
       
       if (count == limit)
-        drawBallCenter(nextPivotEdge, nextPivotVertex, P, r, blue);
+        drawBallCenter(nextPivotEdge, nextPivotVertex, voxelSpace.points, r, blue);
     }
   }
   
   //println("Done");
 }
 
-int ballPivot(Edge pivotEdge, int pivotVertex, List<Point> P, float r) {
+int ballPivot(Edge pivotEdge, int pivotVertex, VoxelSpace voxelSpace, float r) {
   float bestAngle = Float.MAX_VALUE;
   int bestPointIndex = -30;
   
   // AB
-  for (int targetIndex = 0; targetIndex < P.size(); targetIndex++) {
+  for (int targetIndex : voxelSpace.getNeighboringPoints(pivotVertex)) {
     
     if (pivotEdge.first == targetIndex || pivotEdge.second == targetIndex || pivotVertex == targetIndex)
       continue;  
       
-    float angle = pivotAngle(pivotEdge, pivotVertex, targetIndex, P, r);
+    float angle = pivotAngle(pivotEdge, pivotVertex, targetIndex, voxelSpace.points, r);
     if (angle < bestAngle) {
       bestAngle = angle;
       bestPointIndex = targetIndex;

@@ -21,7 +21,8 @@ Boolean
   b1 = true, 
   b2 = true, 
   b3 = true, 
-  b4 = true;
+  b4 = true,
+  flipOrientation = false;
 float 
   h_floor=0, h_ceiling=600, h=h_floor, 
   t=0, 
@@ -93,12 +94,13 @@ void resetAll(){
 }
 
 void draw(){  
+  surface.setTitle("FPS: " + String.format("%.2f", frameRate));
   background(255);
   //hint(ENABLE_DEPTH_TEST); 
   //pushMatrix();   // to ensure that we can restore the standard view before writing on the canvas
   setView();  // see pick tab
-  //showFloor(h); // draws dance floor as yellow mat
-  //doPick(); // sets Of and axes for 3D GUI (see pick Tab)
+  showFloor(h); // draws dance floor as yellow mat
+  doPick(); // sets Of and axes for 3D GUI (see pick Tab)
   R.SETppToIDofVertexWithClosestScreenProjectionTo(Mouse()); // for picking (does not set P.pv)
   //hint(DISABLE_DEPTH_TEST);
   
@@ -112,12 +114,12 @@ void draw(){
     R.showPicked(rb*0.8);
   }
     
-  for (Point p : pointCloud) {
-    fill(blue, 100);
-    strokeWeight(1);
-    stroke(grey);
-    show(p, 0.1);
-  }
+  //for (Point p : pointCloud) {
+  //  fill(blue, 100);
+  //  strokeWeight(1);
+  //  stroke(grey);
+  //  show(p, 0.1);
+  //}
   
   //for (int i =0; i<P.nv; i++){
   //  pointCloud.add(P.G.get(i));
@@ -126,12 +128,19 @@ void draw(){
   //  pointCloud.add(Q.G.get(i));
   //}
   
-  //if (change) {
-    resetAll();
-    float r = 15;
-    //limit = Integer.MAX_VALUE;
-    ballPivot(pointCloud, r, limit);
-  //}
+  
+  if (change) {
+    resetAll();    
+    reTriangulate();
+    resample();
+    
+    float r = 20;
+    VoxelSpace voxelSpace = new VoxelSpace(pointCloud, r * 2);
+    //println("Voxels:", voxelSpace.voxels.size());
+  
+    limit = Integer.MAX_VALUE;
+    ballPivot(voxelSpace, r, flipOrientation, limit);
+  }
   
   strokeWeight(1);
   stroke(black);
@@ -149,22 +158,22 @@ void draw(){
     //fill(blue, 100); show(C, 1);
   }
   
-  for (Edge e : explored) {
-    fill(red);
-    strokeWeight(0);
-    beam(pointCloud.get(e.first), pointCloud.get(e.second), 0.1);
-  }
+  //for (Edge e : explored) {
+  //  fill(red);
+  //  strokeWeight(0);
+  //  beam(pointCloud.get(e.first), pointCloud.get(e.second), 0.1);
+  //}
   
-  for (Edge e : frontier) {
-    if (e == frontier.peek()) {
-      fill(yellow);
-    }
-    else {
-      fill(green);
-    }
-    strokeWeight(0);
-    beam(pointCloud.get(e.first), pointCloud.get(e.second), 0.1);
-  }
+  //for (Edge e : frontier) {
+  //  if (e == frontier.peek()) {
+  //    fill(yellow);
+  //  }
+  //  else {
+  //    fill(green);
+  //  }
+  //  strokeWeight(0);
+  //  beam(pointCloud.get(e.first), pointCloud.get(e.second), 0.1);
+  //}
   
   change = false;
 }
@@ -306,19 +315,19 @@ void resample(){
   for (int i =0; i<P.nv; i++) {
     Point S = P.G.get(i);
     sampledMeshes.add(samplePointsOnSphere(S, rb));
-    break;
+    //break;
   }
   
-  ////Ceiling
-  //for (int i =0; i<Q.nv; i++) {
-  //  Point S = Q.G.get(i);
-  //  sampledMeshes.add(samplePointsOnSphere(S, rb));
-  //}
+  //Ceiling
+  for (int i =0; i<Q.nv; i++) {
+    Point S = Q.G.get(i);
+    sampledMeshes.add(samplePointsOnSphere(S, rb));
+  }
 
   // Beams
-  //for (Edge edge : edges) {
-  //  sampledMeshes.add(samplePointsOnBeam(edge, P, Q, rt));
-  //}
+  for (Edge edge : edges) {
+    sampledMeshes.add(samplePointsOnBeam(edge, P, Q, rt));
+  }
   
   pointCloud.clear();
   
