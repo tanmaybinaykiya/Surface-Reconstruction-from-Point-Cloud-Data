@@ -22,36 +22,15 @@ float angle(Vector U, Vector V, Vector W) {
   return a; 
 }
 
-void drawBallCenter(Triangle t, float r, color c) {
-  Point A = pointCloud.get(t.aIndex);
-  Point B = pointCloud.get(t.bIndex);
-  Point C = pointCloud.get(t.cIndex);
+void drawBallCenter(Edge pivotEdge, int pivotVertex, List<Point> P, float r, color c) {
+  Point A = P.get(pivotVertex);
+  Point B = P.get(pivotEdge.first);
+  Point C = P.get(pivotEdge.second);
   
-  Point centr = centerOfBall(B, A, C, r);
+  Point centr = centerOfBall(A, B, C, r);
   
   fill(c);
-  show(centr, rb);
-  
-  //beginShape();
-  //v(B);
-  //v(A);
-  //v(C);
-  //endShape(CLOSE);
-  
-  strokeWeight(0);
-  fill(c, 50);
-  show(centr, r);
-}
-
-void drawBallCenter(int c, int a, int b, float r, color col) {
-  Point C = pointCloud.get(c);
-  Point A = pointCloud.get(a);
-  Point B = pointCloud.get(b);
-  
-  Point centr = centerOfBall(C, A, B, r);
-  
-  fill(col);
-  show(centr, rb/10);
+  show(centr, 0.1);
   
   //beginShape();
   //v(B);
@@ -60,14 +39,30 @@ void drawBallCenter(int c, int a, int b, float r, color col) {
   //endShape(CLOSE);
   
   strokeWeight(1);
-  //fill(col, 50);
-  stroke(black, 50);
+  stroke(c, 100);
   noFill();
+  //fill(c, 50);
   show(centr, r);
 }
 
+void drawNormal(List<Point> P, Edge e, int vertex, float r) {
+  int e1 = e.first, e2 = e.second;
+  Point 
+    E1 = P.get(e1),
+    E2 = P.get(e2),
+    V = P.get(vertex);
+    
+  Point ballCenter = centerOfBall(E1, E2, V, r);
+  
+  strokeWeight(0);
+  fill(yellow);
+  beam(P(E1,E2), ballCenter, 0.2);
+    
+  //VS x SF
+}
+
 void addSeedEdges(List<Point> P, float r){
-  for (int i = 0; i<P.size(); i++){
+  for (int i = 50; i<P.size(); i++){
     for (int j = i+1; j<P.size(); j++){
       for (int k = j+1; k<P.size(); k++){
         Point I = P.get(i);
@@ -92,9 +87,16 @@ void addSeedEdges(List<Point> P, float r){
         }
         
         if (isValid){
-          frontier.put(new Edge(j, i), k);
-          frontier.put(new Edge(k, j), i);
-          frontier.put(new Edge(i, k), j);
+          Edge e1 = new Edge(j, i),
+               e2 = new Edge(k, j),
+               e3 = new Edge(i, k);
+               
+          pivotEdges.put(e1, k);
+          pivotEdges.put(e2, i);
+          pivotEdges.put(e3, j);
+          frontier.add(e1);
+          frontier.add(e2);
+          frontier.add(e3);
           generatedTriangles.add(new Triangle(i, j, k));
           return;
         }
@@ -106,7 +108,7 @@ void addSeedEdges(List<Point> P, float r){
 
 void ballPivot(List<Point> P, float r, int limit){
   addSeedEdges(P, r);
-  println("Added seed edges: ", frontier);
+  //println("Added seed edges: ", frontier);
   
   int count = 0;
   
@@ -114,19 +116,15 @@ void ballPivot(List<Point> P, float r, int limit){
     //println(frontier);
     
     // Get the next item from the frontier
-    Map.Entry<Edge, Integer> front = frontier.entrySet().iterator().next();    
-    Edge pivotEdge = front.getKey();
-    int pivotVertex = front.getValue();
-    
-    frontier.remove(pivotEdge);
+    Edge pivotEdge = frontier.pop();
+    int pivotVertex = pivotEdges.remove(pivotEdge);
     
     // Add the frontier to explored
     explored.add(pivotEdge);
     count++;
     
-    
-    
-    int nextVertex = ballPivot(pivotEdge.first, pivotEdge.second, pivotVertex, P, r);    
+    //drawNormal(P, pivotEdge, pivotVertex, r);
+    int nextVertex = ballPivot(pivotEdge, pivotVertex, P, r);    
     
     //if (count == limit) {
     //  drawBallCenter(pivotVertex, pivotEdge.first, pivotEdge.second, r, blue);
@@ -147,54 +145,63 @@ void ballPivot(List<Point> P, float r, int limit){
     if (explored.contains(edgeFirst)) {
       exploredEdgeFirst = true;
     }
-    if (!frontier.containsKey(edgeFirst) && !exploredEdgeFirst) {
+    if (!frontier.contains(edgeFirst) && !exploredEdgeFirst) {
       // This edge was not seen, so add it to the frontier
-      frontier.put(edgeFirst, pivotEdge.second);
+      pivotEdges.put(edgeFirst, pivotEdge.second);
+      frontier.add(edgeFirst);
     }
     
     if (explored.contains(edgeSecond)) {
       exploredEdgeSecond = true;
     }
-    if (!frontier.containsKey(edgeSecond) && !exploredEdgeSecond) {
+    if (!frontier.contains(edgeSecond) && !exploredEdgeSecond) {
       // This edge was not seen, so add it to the frontier
-      frontier.put(edgeSecond, pivotEdge.first);
+      pivotEdges.put(edgeSecond, pivotEdge.first);
+      frontier.add(edgeSecond);
     }
     
     if (!exploredEdgeFirst && !exploredEdgeSecond) {
       // Neither edge was found, so this is a new triangle
       generatedTriangles.add(new Triangle(pivotEdge.first, pivotEdge.second, nextVertex));
+      
+      // Peek at the ball that will pivot around the next triangle
+      Edge nextPivotEdge = frontier.peek();
+      int nextPivotVertex = pivotEdges.get(nextPivotEdge);
+      
+      if (count == limit)
+        drawBallCenter(nextPivotEdge, nextPivotVertex, P, r, blue);
     }
   }
   
   //println("Done");
 }
 
-int ballPivot(int aIndex, int bIndex, int cIndex, List<Point> P, float r) {
+int ballPivot(Edge pivotEdge, int pivotVertex, List<Point> P, float r) {
   float bestAngle = Float.MAX_VALUE;
   int bestPointIndex = -30;
   
   // AB
-  Point A  = P.get(aIndex);
-  Point B  = P.get(bIndex);
-  Point C  = P.get(cIndex);
-
-  for (int dIndex=0; dIndex <P.size(); dIndex++) {
-    Point D  = P.get(dIndex);
+  for (int targetIndex = 0; targetIndex < P.size(); targetIndex++) {
     
-    if(aIndex != dIndex && bIndex != dIndex){ // let c match d - if we pivot to c we dont create the triangle 
-      float angle = pivotAngle(A, B, C, D, r);
+    if (pivotEdge.first == targetIndex || pivotEdge.second == targetIndex || pivotVertex == targetIndex)
+      continue;  
       
-      if (angle < bestAngle) {
-        bestAngle = angle;
-        bestPointIndex = dIndex;
-      }
+    float angle = pivotAngle(pivotEdge, pivotVertex, targetIndex, P, r);
+    if (angle < bestAngle) {
+      bestAngle = angle;
+      bestPointIndex = targetIndex;
     }
   }
      
   return bestPointIndex;
 }
 
-float pivotAngle(Point B, Point C, Point A, Point D, float r) {
+float pivotAngle(Edge edge, int sourceVertex, int targetVertex, List<Point> P, float r) {
+  Point A = P.get(sourceVertex),
+        B = P.get(edge.first),
+        C = P.get(edge.second),
+        D = P.get(targetVertex);
+        
   Point centerABC = centerOfBall(A, B, C, r);
   Point centerCBD = centerOfBall(C, B, D, r);
   

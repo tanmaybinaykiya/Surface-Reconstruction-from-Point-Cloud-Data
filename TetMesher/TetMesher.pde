@@ -29,7 +29,7 @@ float
   rb=30, rt=rb; // radius of the balls and tubes
 
 int
-  f=0, maxf=2*30, level=4, method=5, limit=0;
+  f=0, maxf=2*30, level=4, method=5, limit=9;
 String SDA = "angle";
 float defectAngle=0;
 Points P; // polyloop in 3D
@@ -41,7 +41,8 @@ List<EquilateralMesh> sampledMeshes;
 List<Point> pointCloud;
 
 List<Triangle> generatedTriangles ;
-Map<Edge, Integer> frontier;
+Map<Edge, Integer> pivotEdges;
+Stack<Edge> frontier;
 Set<Edge> explored;
 Set<Edge> boundaryEdges;
 
@@ -85,35 +86,37 @@ void resetAll(){
   //sampledMeshes = new ArrayList();
   //pointCloud = new ArrayList();
   generatedTriangles = new ArrayList();
-  frontier = new HashMap();
+  pivotEdges = new HashMap();
+  frontier = new Stack();
   explored = new HashSet();
   boundaryEdges = new HashSet();
 }
 
 void draw(){  
   background(255);
-  hint(ENABLE_DEPTH_TEST); 
+  //hint(ENABLE_DEPTH_TEST); 
   //pushMatrix();   // to ensure that we can restore the standard view before writing on the canvas
   setView();  // see pick tab
-  showFloor(h); // draws dance floor as yellow mat
+  //showFloor(h); // draws dance floor as yellow mat
   //doPick(); // sets Of and axes for 3D GUI (see pick Tab)
   R.SETppToIDofVertexWithClosestScreenProjectionTo(Mouse()); // for picking (does not set P.pv)
   //hint(DISABLE_DEPTH_TEST);
   
-  if (showBalls) {
+  if (showBalls) 
+  {
     fill(orange); 
-    P.drawBalls(rb);
+    P.drawBalls(rb*0.7);
     fill(green); 
-    Q.drawBalls(rb);  
+    Q.drawBalls(rb*0.7);  
     fill(red, 100); 
-    R.showPicked(rb+5);
+    R.showPicked(rb*0.8);
   }
     
   for (Point p : pointCloud) {
     fill(blue, 100);
     strokeWeight(1);
     stroke(grey);
-    show(p, 0.5);
+    show(p, 0.1);
   }
   
   //for (int i =0; i<P.nv; i++){
@@ -132,7 +135,7 @@ void draw(){
   
   strokeWeight(1);
   stroke(black);
-  fill(orange, 255);
+  fill(pink, 200);
   //println("Triangles:", generatedTriangles.size());
   for (Triangle t: generatedTriangles){
     t.drawMe();
@@ -146,24 +149,22 @@ void draw(){
     //fill(blue, 100); show(C, 1);
   }
   
-  //for (Edge e : explored) {
-  //  fill(red);
-  //  strokeWeight(0);
-  //  beam(pointCloud.get(e.first), pointCloud.get(e.second), 0.5);
-  //}
+  for (Edge e : explored) {
+    fill(red);
+    strokeWeight(0);
+    beam(pointCloud.get(e.first), pointCloud.get(e.second), 0.1);
+  }
   
-  //boolean first = true;
-  //for (Edge e : frontier.keySet()) {
-  //  if (first) {
-  //    fill(yellow);
-  //    first = false;
-  //  }
-  //  else {
-  //    fill(green);
-  //  }
-  //  strokeWeight(0);
-  //  beam(pointCloud.get(e.first), pointCloud.get(e.second), 0.5);
-  //}
+  for (Edge e : frontier) {
+    if (e == frontier.peek()) {
+      fill(yellow);
+    }
+    else {
+      fill(green);
+    }
+    strokeWeight(0);
+    beam(pointCloud.get(e.first), pointCloud.get(e.second), 0.1);
+  }
   
   change = false;
 }
@@ -191,11 +192,11 @@ void real_draw() {
   if (showBalls) 
   {
     fill(orange); 
-    P.drawBalls(rb);
+    P.drawBalls(rb*0.7);
     fill(green); 
-    Q.drawBalls(rb);  
-    fill(red, 100); 
-    R.showPicked(rb+5);
+    Q.drawBalls(rb*0.7);  
+    //fill(red, 100); 
+    //R.showPicked(rb*0.9);
   }
   
   float r = 100;

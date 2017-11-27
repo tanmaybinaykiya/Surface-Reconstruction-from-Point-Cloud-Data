@@ -32,6 +32,15 @@ void disk(Point P, Vector I, Vector J, float r) {
   endShape();
   }
   
+
+void semiDisk(Point P, Vector I, Vector J, float r, float angleStart, float angleEnd) {
+  float da = (angleEnd - angleStart)/36;
+  beginShape(TRIANGLE_FAN);
+    v(P);
+    for(float a=angleStart; a<=angleEnd+da; a+=da) v(P(P,r*cos(a),I,r*sin(a),J));
+  endShape();
+  }
+  
 void disk(Point P, Vector V, float r) {  
   Vector I = U(Normal(V));
   Vector J = U(N(I,V));

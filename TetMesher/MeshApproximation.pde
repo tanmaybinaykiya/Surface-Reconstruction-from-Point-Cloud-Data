@@ -52,7 +52,7 @@ EquilateralMesh samplePointsOnSphere(Point P, float radius) {
   Vector i = V(1, 0, 0);
   Vector j = V(0, 1, 0);
   Vector k = V(0, 0, 1);
-  for (float r = -radius + 0.5; r < radius; r += 8){
+  for (float r = -radius + 1; r < radius; r += 8){
     float thisRadius = sqrt(radius*radius - r*r);
     float dTheta = PI/someConst; // L / (thisRadius * 3);
 
