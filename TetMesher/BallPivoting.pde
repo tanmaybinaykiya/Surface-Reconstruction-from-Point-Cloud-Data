@@ -2,6 +2,10 @@ Point centerOfBall(Point A, Point B, Point C, float r) {
   Point circumcenter = circumcircleCenter(A, B, C);
   Vector normal = U(N(V(A,C), V(C, B)));
   
+  if (norm(normal) == 0) {
+    return null;
+  }
+  
   float dACircumcenter = d(A, circumcenter);
   
   if (r < dACircumcenter)
@@ -61,8 +65,23 @@ void drawNormal(List<Point> P, Edge e, int vertex, float r) {
   //VS x SF
 }
 
-void addSeedEdges(VoxelSpace voxelSpace, float r, boolean flipOrientation){
-  for (int i = 0; i<voxelSpace.points.size(); i++){
+void addTriangle(List<Point> points, int pivotFirstVertex, int otherVertex, int pivotSecondVertex) {
+  // Add the triangle and compute its normal
+  generatedTriangles.add(new Triangle(pivotFirstVertex, otherVertex, pivotSecondVertex));
+  
+  // Add the normal component
+  Point P1 = points.get(pivotFirstVertex);
+  Point P2 = points.get(pivotSecondVertex);
+  Point PP = points.get(otherVertex);
+  
+  pointNormals[pivotFirstVertex].add(N(V(P1, P2), V(P1, PP)));
+  pointNormals[otherVertex].add(N(V(PP, P1), V(PP, P2)));
+  pointNormals[pivotSecondVertex].add(N(V(P2, PP), V(P2, P1)));
+}
+
+void addSeedEdges(VoxelSpace voxelSpace, float r, boolean flipOrientation, VoxelCoordinate seedCoordinate){
+  //for (int i = 0; i<voxelSpace.points.size(); i++){
+  for (int i : voxelSpace.voxels.get(seedCoordinate)) {
     for (int j : voxelSpace.getNeighboringPoints(i)) {
       for (int k : voxelSpace.getNeighboringPoints(j)) {
         if (i == j || i == k || j == k)
@@ -110,7 +129,13 @@ void addSeedEdges(VoxelSpace voxelSpace, float r, boolean flipOrientation){
           frontier.add(e1);
           frontier.add(e2);
           frontier.add(e3);
-          generatedTriangles.add(new Triangle(i, j, k));
+          
+          if (flipOrientation) {
+            addTriangle(voxelSpace.points, j, i, k);
+          }
+          else {
+            addTriangle(voxelSpace.points, i, j, k);
+          }
           return;
         }
       }
@@ -119,11 +144,9 @@ void addSeedEdges(VoxelSpace voxelSpace, float r, boolean flipOrientation){
   throw new RuntimeException("No seed triangle found. Better luck next time.");
 }
 
-void ballPivot(VoxelSpace voxelSpace, float r, boolean flipOrientation, int limit){
-  addSeedEdges(voxelSpace, r, flipOrientation);
-  println("Added seed edges: ", frontier);
-  
+int ballPivot(VoxelSpace voxelSpace, float r, int limit){
   int count = 0;
+  int lastPivotVertex = 0;
   
   while (!frontier.isEmpty() && count < limit) {
     //println(frontier);
@@ -138,6 +161,7 @@ void ballPivot(VoxelSpace voxelSpace, float r, boolean flipOrientation, int limi
     
     //drawNormal(P, pivotEdge, pivotVertex, r);
     int nextVertex = ballPivot(pivotEdge, pivotVertex, voxelSpace, r);    
+    lastPivotVertex = nextVertex;
     
     //if (count == limit) {
     //  drawBallCenter(pivotVertex, pivotEdge.first, pivotEdge.second, r, blue);
@@ -175,16 +199,7 @@ void ballPivot(VoxelSpace voxelSpace, float r, boolean flipOrientation, int limi
     
     if (!exploredEdgeFirst && !exploredEdgeSecond) {
       // Neither edge was found, so this is a new triangle
-      generatedTriangles.add(new Triangle(pivotEdge.first, nextVertex, pivotEdge.second));
-      
-      // Add the normal component
-      Point P1 = voxelSpace.points.get(pivotEdge.first);
-      Point P2 = voxelSpace.points.get(pivotEdge.second);
-      Point PP = voxelSpace.points.get(nextVertex);
-      
-      pointNormals[pivotEdge.first].add(N(V(P1, P2), V(P1, PP)));
-      pointNormals[nextVertex].add(N(V(PP, P1), V(PP, P2)));
-      pointNormals[pivotEdge.second].add(N(V(P2, PP), V(P2, P1)));
+      addTriangle(voxelSpace.points, pivotEdge.first, nextVertex, pivotEdge.second);
       
       if (count == limit) {
         // Peek at the ball that will pivot around the next triangle
@@ -195,7 +210,7 @@ void ballPivot(VoxelSpace voxelSpace, float r, boolean flipOrientation, int limi
     }
   }
   
-  //println("Done");
+  return lastPivotVertex;
 }
 
 int ballPivot(Edge pivotEdge, int pivotVertex, VoxelSpace voxelSpace, float r) {

@@ -5,7 +5,7 @@ Boolean
   center=true, 
   track=false, 
   showViewer=false, 
-  showBalls=false, 
+  showBalls=true, 
   showControl=true, 
   showCurve=true, 
   showPath=true, 
@@ -21,17 +21,24 @@ Boolean
   b1 = true, 
   b2 = true, 
   b3 = true, 
-  b4 = true,
-  b5 = true,
+  //b4 = true,
+  //b5 = true,
   flipOrientation = false;
+  
+// Flags that track which demo mode we are in
+enum DemoMode { DELAUNAY, POINT_SAMPLING, BALL_PIVOTING_MANUAL, BALL_PIVOTING_AUTOMATIC }
+DemoMode mode = DemoMode.DELAUNAY;
+
 float 
   h_floor=0, h_ceiling=600, h=h_floor, 
   t=0, 
   s=0, 
-  rb=30, rt=rb; // radius of the balls and tubes
+  rb=30, rt=rb/2; // radius of the balls and tubes
+ 
+int tetrahedraCount = 0;
 
 int
-  f=0, maxf=2*30, level=4, method=5, limit=9;
+  f=0, maxf=2*30, level=4, method=5, limit=0;
 String SDA = "angle";
 float defectAngle=0;
 Points P; // polyloop in 3D
@@ -74,204 +81,188 @@ void setup() {
   // Re-render initially
   change = true;
   
-  reTriangulate();
-  resample();
-  
-  
-    
-
-  
   //sampledMeshes.add(testSamplePointsOnSphere());
 }
 
 void resetAll(){
-  //edges = new HashSet();
-  //sampledMeshes = new ArrayList();
-  //pointCloud = new ArrayList();
   generatedTriangles = new ArrayList();
   pivotEdges = new HashMap();
   frontier = new Stack();
   explored = new HashSet();
   boundaryEdges = new HashSet();
+  
+  pointNormals = new Vector[pointCloud.size()];
+  for (int i = 0; i < pointNormals.length; i++) {
+    pointNormals[i] = V(0, 0, 0);
+  }
 }
 
 void draw(){  
   surface.setTitle("FPS: " + String.format("%.2f", frameRate));
   background(255);
-  //hint(ENABLE_DEPTH_TEST); 
-  //pushMatrix();   // to ensure that we can restore the standard view before writing on the canvas
-  setView();  // see pick tab
-  showFloor(h); // draws dance floor as yellow mat
-  doPick(); // sets Of and axes for 3D GUI (see pick Tab)
-  R.SETppToIDofVertexWithClosestScreenProjectionTo(Mouse()); // for picking (does not set P.pv)
-  //hint(DISABLE_DEPTH_TEST);
-  
-  if (showBalls) 
-  {
-    fill(orange); 
-    P.drawBalls(rb*0.7);
-    fill(green); 
-    Q.drawBalls(rb*0.7);  
-    fill(red, 100); 
-    R.showPicked(rb*0.8);
-  }
-    
-  //for (Point p : pointCloud) {
-  //  fill(blue, 100);
-  //  strokeWeight(1);
-  //  stroke(grey);
-  //  show(p, 0.1);
-  //}
-  
-  //for (int i =0; i<P.nv; i++){
-  //  pointCloud.add(P.G.get(i));
-  //}
-  //for (int i =0; i<Q.nv; i++){
-  //  pointCloud.add(Q.G.get(i));
-  //}
-  
-  
-  if (change) {
-    resetAll();    
-    reTriangulate();
-    resample();
-    
-    pointNormals = new Vector[pointCloud.size()];
-    for (int i = 0; i < pointNormals.length; i++) {
-      pointNormals[i] = V(0, 0, 0);
-    }
-    
-    float r = 20;
-    VoxelSpace voxelSpace = new VoxelSpace(pointCloud, r * 2);
-    //println("Voxels:", voxelSpace.voxels.size());
-  
-    limit = Integer.MAX_VALUE;
-    ballPivot(voxelSpace, r, flipOrientation, limit);
-  }
-  
-  //strokeWeight(1);
-  //stroke(black);
-  fill(pink);
-  //println("Triangles:", generatedTriangles.size());
-  for (Triangle t: generatedTriangles){
-    t.drawMe(b5); // b5 == smoothShading?
-    //Point A = pointCloud.get(t.aIndex);
-    //Point B = pointCloud.get(t.bIndex);
-    //Point C = pointCloud.get(t.cIndex);
-    //println("A:", A, "B:", B, "C:", C);
-    
-    //fill(red, 100); show(A, 1);
-    //fill(green, 100); show(B, 1);
-    //fill(blue, 100); show(C, 1);
-  }
-  
-  //for (Edge e : explored) {
-  //  fill(red);
-  //  strokeWeight(0);
-  //  beam(pointCloud.get(e.first), pointCloud.get(e.second), 0.1);
-  //}
-  
-  //for (Edge e : frontier) {
-  //  if (e == frontier.peek()) {
-  //    fill(yellow);
-  //  }
-  //  else {
-  //    fill(green);
-  //  }
-  //  strokeWeight(0);
-  //  beam(pointCloud.get(e.first), pointCloud.get(e.second), 0.1);
-  //}
-  
-  change = false;
-}
-
-void test_draw(){
-  //testSamplePointsOnSphere();
-  for (EquilateralMesh sampledMesh:sampledMeshes){
-    sampledMesh.draw();
-  }
-  //resample();
-}
-
-
-
-void real_draw() {
-  background(255);
-  //hint(ENABLE_DEPTH_TEST); 
+  hint(ENABLE_DEPTH_TEST); 
   pushMatrix();   // to ensure that we can restore the standard view before writing on the canvas
   setView();  // see pick tab
   showFloor(h); // draws dance floor as yellow mat
   doPick(); // sets Of and axes for 3D GUI (see pick Tab)
   R.SETppToIDofVertexWithClosestScreenProjectionTo(Mouse()); // for picking (does not set P.pv)
-  //hint(DISABLE_DEPTH_TEST);
   
-  if (showBalls) 
-  {
-    fill(orange); 
-    P.drawBalls(rb*0.7);
-    fill(green); 
-    Q.drawBalls(rb*0.7);  
-    //fill(red, 100); 
-    //R.showPicked(rb*0.9);
+  R.showPicked(rb*1.05);
+  
+  if (mode == DemoMode.DELAUNAY) {
+    /*********************************
+     * Part 1: Triangulate the mesh
+     *********************************/
+     
+    if (change) {
+      reTriangulate();
+    }
+    
+    if (showBalls) {
+      fill(orange); 
+      P.drawBalls(rb);
+      fill(green); 
+      Q.drawBalls(rb);  
+      fill(red, 100); 
+    }
+  
+    if (showTube) {
+      // Draw all of the edges
+      drawEdgeSet(edges, P, Q, green, orange, grey);
+    }
   }
+  else if (mode == DemoMode.POINT_SAMPLING) {
+    ///*********************************
+    // * Part 2: Approximate the mesh
+    // *********************************/
+    
+    if (change) {
+      // Re-calculate the approximations
+      reTriangulate();
+      resample();
+    }
   
-  float r = 100;
-  Point A = Q.G.get(0), B = Q.G.get(1), C = Q.G.get(2);
-  //Point D1 = P.G.get(0), D2 = P.G.get(1);
+    fill(white);
+    stroke(black);
+    strokeWeight(1);
+    for (EquilateralMesh mesh : sampledMeshes) {
+      mesh.draw();
+    }
+  }
+  else if (mode == DemoMode.BALL_PIVOTING_MANUAL) {
+    if (change) {
+      reTriangulate();
+      resample();
+    }
+    
+    ///*********************************
+    // * Part 3: Allow user to control ball pivoting
+    // *********************************/
+    
+    resetAll();    
+    float r = 20;
+    VoxelSpace voxelSpace = new VoxelSpace(pointCloud, r * 2);    
+    
+    // Add the seed triangle
+    // We want to set this at the center of some beam
+    Edge beam = edges.iterator().next();
+    VoxelCoordinate v1 = voxelSpace.getCoordinate(beam.getFirstPoint(P, Q));
+    VoxelCoordinate v2 = voxelSpace.getCoordinate(beam.getSecondPoint(P, Q));
+    VoxelCoordinate vMid = new VoxelCoordinate((v1.x + v2.x)/2, (v1.y + v2.y)/2, (v1.z + v2.z)/2);
+    
+    addSeedEdges(voxelSpace, r, flipOrientation, vMid);    
+    println("Added seed edges:", frontier);
+    int lastPivotVertex = ballPivot(voxelSpace, r, limit);
+    
+    fill(pink);
+    for (Triangle t: generatedTriangles){
+      t.drawMe(b1); // b1 is smooth shading
+    }
+    
+    for (Edge e : explored) {
+      fill(red);
+      strokeWeight(0);
+      beam(pointCloud.get(e.first), pointCloud.get(e.second), 0.1);
+    }
+    
+    for (Edge e : frontier) {
+      if (e == frontier.peek()) {
+        fill(yellow);
+      }
+      else {
+        fill(green);
+      }
+      strokeWeight(0);
+      beam(pointCloud.get(e.first), pointCloud.get(e.second), 0.1);
+    }
   
-  //float angle1 = pivotAngle(B, C, A, D1, r);
-  //float angle2 = pivotAngle(B, C, A, D2, r);
-  //Point D = (angle1 < angle2 ? D1 : D2);
-  
-  //Point centerABC = centerOfBall(A, B, C, r);
-  //Point centerCBD = centerOfBall(C, B, D, r);
-  
-  //drawBallCenter(A, B, C, centerABC, r, blue);
-  //drawBallCenter(C, B, D, centerCBD, r, orange);
-  
-  //Point D1 = ballPivot(A, B, C, P, r);
-  //Point D2 = ballPivot(B, C, A, P, r);
-  //Point D3 = ballPivot(C, A, B, P, r);
-  
-  //drawBallCenter(A, B, C, centerOfBall(A, B, C, r), r, blue);
-  //drawBallCenter(B, A, D1, centerOfBall(B, A, D1, r), r, red);
-  //drawBallCenter(C, B, D2, centerOfBall(C, B, D2, r), r, green);
-  //drawBallCenter(A, C, D3, centerOfBall(A, C, D3, r), r, orange);
-
-  /*********************************
-   * Part 1: Triangulate the mesh
-   *********************************/
-  //if (change) {
-  //  reTriangulate();
-  //}
-
-  //if (showTube) {
-  //  // Draw all of the edges
-    //drawEdgeSet(edges, P, Q, green, orange, grey);
-  //}
-
-  ///*********************************
-  // * Part 2: Approximate the mesh
-  // *********************************/
-  //if (change) {
-  //  // Re-calculate the approximations
-  //  resample();
-  //}
-
-  //fill(white);
-  //stroke(black);
-  //strokeWeight(1);
-  //for (EquilateralMesh mesh : sampledMeshes) {
-  //  mesh.draw();
-  //}
+    if (animating) {
+      t += 1;
+      
+      // Animate the limit
+      if (t % 2 == 0) {
+        limit += 1;
+      }
+    }
+    
+    if (b2) {
+      // Show the point cloud around where the ball is
+      for (int vertexIndex : voxelSpace.getNeighboringPoints(lastPivotVertex)) {
+        Point P = pointCloud.get(vertexIndex);
+        fill(blue);
+        show(P, 0.5);
+      }
+    }
+  }
+  else if (mode == DemoMode.BALL_PIVOTING_AUTOMATIC) {
+    ///*********************************
+    // * Part 4: Automatic ball pivoting
+    // *********************************/
+    
+    if (change) {
+      reTriangulate();
+      resample();
+      resetAll();    
+      
+      float r = 20;
+      limit = Integer.MAX_VALUE;
+      VoxelSpace voxelSpace = new VoxelSpace(pointCloud, r * 2);    
+      
+      // Add the seed triangle
+      // We want to set this at the center of some beam
+      Edge beam = edges.iterator().next();
+      VoxelCoordinate v1 = voxelSpace.getCoordinate(beam.getFirstPoint(P, Q));
+      VoxelCoordinate v2 = voxelSpace.getCoordinate(beam.getSecondPoint(P, Q));
+      VoxelCoordinate vMid = new VoxelCoordinate((v1.x + v2.x)/2, (v1.y + v2.y)/2, (v1.z + v2.z)/2);
+      
+      addSeedEdges(voxelSpace, r, flipOrientation, vMid);    
+      println("Added seed edges:", frontier);
+      ballPivot(voxelSpace, r, limit);
+    }
+    
+    fill(pink);
+    for (Triangle t: generatedTriangles){
+      t.drawMe(b1); // b1 is smooth shading
+    }
+  }
   
   popMatrix(); // done with 3D drawing. Restore front view for writing text on canvas
   hint(DISABLE_DEPTH_TEST); // no z-buffer test to ensure that help text is visible
 
   //*** TEAM: please fix these so that they provice the correct counts
-  scribeHeader("Site count: " + 3 + " floor + " + 7 + " ceiling ", 1);
-  scribeHeader("Beam count: " + 3 + " floor + " + 7 + " ceiling " + 6 + " mixed", 2);
-  scribeHeader("Tet count: " + 20, 3);
+  int floorBeams = 0, ceilingBeams = 0, mixedBeams = 0;
+  for (Edge edge : edges) {
+    if (edge.first > 0 && edge.second > 0) 
+      floorBeams++;
+    else if (edge.first < 0 && edge.second < 0) 
+      ceilingBeams++;
+    else 
+      mixedBeams++;
+  }
+  
+  scribeHeader("Site count: " + P.nv + " floor + " + Q.nv + " ceiling ", 1);
+  scribeHeader("Beam count: " + floorBeams + " floor + " + ceilingBeams + " ceiling " + mixedBeams + " mixed", 2);
+  scribeHeader("Tet count: " + tetrahedraCount, 3);
 
   // used for demos to show red circle when mouse/key is pressed and what key (disk may be hidden by the 3D model)
   if (mousePressed) {
@@ -303,15 +294,25 @@ void real_draw() {
 void reTriangulate(){
   // Re-calculate triangulation
   edges.clear();
+  tetrahedraCount = 0;
 
-  if (b1) // 1-3 
-    edges.addAll(triangulate(P, Q, true));
-
-  if (b2) // 2-2
-    edges.addAll(triangulate2to2(P, Q));
-
-  if (b3) // 3-1
-    edges.addAll(triangulate(P, Q, false));
+  if (mode == DemoMode.DELAUNAY) {
+    // In this demo mode, allow the user to change which tubes to show
+    if (b1) // 1-3 
+      edges.addAll(triangulate(P, Q, true));
+  
+    if (b2) // 2-2
+      edges.addAll(triangulate2to2(P, Q));
+  
+    if (b3) // 3-1
+      edges.addAll(triangulate(P, Q, false));
+  }
+  else {
+    // In other modes, always do all triangulations
+      edges.addAll(triangulate(P, Q, true));
+      edges.addAll(triangulate2to2(P, Q));
+      edges.addAll(triangulate(P, Q, false));
+  }
   
 }
 

@@ -97,8 +97,9 @@ Set<Edge> triangulate2to2(Points floor, Points ceil) {
           edges.add(edgeFloorCeiling(b, d));
           edges.add(edgeCeilingCeiling(c, d));
 
-          if (b4)
-            drawTetrahedron(A, B, C, D);
+          tetrahedraCount++;
+          //if (b4)
+          //  drawTetrahedron(A, B, C, D);
         }
       }
     }
@@ -163,8 +164,9 @@ Set<Edge> triangulate(Points floor, Points ceil, boolean flip) {
             edges.add(edgeFloorCeiling(c, d));
           }
 
-          if (b4)
-            drawTetrahedron(A, B, C, D);
+          tetrahedraCount++;
+          //if (b4)
+          //  drawTetrahedron(A, B, C, D);
         }
       }
     }

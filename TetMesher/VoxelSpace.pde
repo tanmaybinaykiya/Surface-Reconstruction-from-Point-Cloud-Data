@@ -59,6 +59,10 @@ public class VoxelSpace {
   
   public VoxelCoordinate getCoordinate(int pIndex) {
     Point P = this.points.get(pIndex);
+    return this.getCoordinate(P);
+  }
+  
+  public VoxelCoordinate getCoordinate(Point P) {
     return new VoxelCoordinate(int(P.x / this.cellSize), int(P.y / this.cellSize), int(P.z / this.cellSize));
   }
   
