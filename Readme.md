@@ -6,3 +6,5 @@ The project aims to compute a tetrahedronalization from balls on a floor and on 
 
 Detailed Report can be found on the [project page](https://tanmaybinaykiya.github.io/tetrahedralization-of-3d-meshes)
 
+[![](https://img.youtube.com/vi/bC1mUjPqBsM/0.jpg)](https://youtu.be/bC1mUjPqBsM) 
+
